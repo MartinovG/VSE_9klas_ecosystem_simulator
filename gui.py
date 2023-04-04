@@ -1,4 +1,5 @@
 import pygame
+import pygame_widgets
 import random
 
 pygame.init()
@@ -6,24 +7,24 @@ pygame.init()
 screen_width = 1000
 screen_height = 700
 screen = pygame.display.set_mode((screen_width, screen_height))
+button_color = ('#808080')
+color1 = ('#0000FF') # Blue
+color2 = ('#FF0000') # Red
+color3 = ('#00FF00') # Green
+color4 = ('#FFFFFF') # White
+color5 = ('#FFFF00') #Yellow
 border_color = ('#808080') # Grey
 border_thickness = 2
 font = pygame.font.Font(None, 36)
-button_rect = pygame.Rect(100, 100, 200, 50)
+button_rect = pygame.draw.rect(screen, button_color, pygame.Rect(10, 10, 100, 50))
 button_color = ('#808080')
-button_text = "Start!"
+
 
 pygame.draw.rect(screen, border_color, (290, 10, 700, 400), border_thickness)
 
 pygame.display.set_caption("Ecosystem Simulator")
 
 clock = pygame.time.Clock()
-
-color1 = ('#0000FF') # Blue
-color2 = ('#FF0000') # Red
-color3 = ('#00FF00') # Green
-color4 = ('#FFFFFF') # White
-color5 = ('#FFFF00') #Yellow
 
 spawning = False
 
@@ -54,23 +55,21 @@ def bear(x, y, color):
 
 
 def draw_button_off():
-    button_surf = pygame.Surface(button_rect.size)
-    button_surf.fill(button_color)
-    screen.blit(button_surf, button_rect)
-    
+    button_text = "Start!"
     text_surf = font.render(button_text, True, (255, 255, 255))
     text_rect = text_surf.get_rect(center=button_rect.center)
+    pygame.draw.rect(screen, button_color, button_rect)
     screen.blit(text_surf, text_rect)
+    pygame.display.flip()
 
 def draw_button_on():
     button_text = "Stop!"
-    button_surf = pygame.Surface(button_rect.size)
-    button_surf.fill(button_color)
-    screen.blit(button_surf, button_rect)
-    
     text_surf = font.render(button_text, True, (255, 255, 255))
     text_rect = text_surf.get_rect(center=button_rect.center)
+    pygame.draw.rect(screen, button_color, button_rect)
     screen.blit(text_surf, text_rect)
+    pygame.display.flip()
+
 
 def button_click():
     global spawning
@@ -107,7 +106,5 @@ while True:
             else:
                 bear(x, y, color5)
         pygame.display.update()
-
-    pygame.display.flip()
 
     clock.tick(60)
