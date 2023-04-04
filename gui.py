@@ -53,7 +53,17 @@ def bear(x, y, color):
             screen.set_at((i, j), color)
 
 
-def draw_button():
+def draw_button_off():
+    button_surf = pygame.Surface(button_rect.size)
+    button_surf.fill(button_color)
+    screen.blit(button_surf, button_rect)
+    
+    text_surf = font.render(button_text, True, (255, 255, 255))
+    text_rect = text_surf.get_rect(center=button_rect.center)
+    screen.blit(text_surf, text_rect)
+
+def draw_button_on():
+    button_text = "Stop!"
     button_surf = pygame.Surface(button_rect.size)
     button_surf.fill(button_color)
     screen.blit(button_surf, button_rect)
@@ -66,7 +76,7 @@ def button_click():
     global spawning
     spawning = not spawning
 
-draw_button()
+draw_button_off()
 
 while True:
     for event in pygame.event.get():
@@ -76,6 +86,11 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if button_rect.collidepoint(event.pos):
                 button_click()
+
+    if spawning:
+        draw_button_on()
+    else:
+        draw_button_off()
 
     if spawning:
         x = random.randint(300, screen_width - 20)
