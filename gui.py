@@ -10,6 +10,7 @@ SCREEN_HEIGHT = 600
 FPS = 60
 BACKGROUND_COLOR = ('#FFFFFF') # White
 PLANT_COLOR = (0, 255, 0) # Green
+HERBIVORE_COLOR = (255, 0, 0) # Red
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
@@ -23,8 +24,19 @@ class Plant:
     def draw(self, screen ):
         radius = 5
         pygame.gfxdraw.filled_circle(screen, self.x, self.y, radius, PLANT_COLOR)
+        pygame.gfxdraw.aacircle(screen, self.x, self.y, radius, PLANT_COLOR)
+
+class Herbivore:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def draw(self, screen):
+        pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), 10, HERBIVORE_COLOR)
+        pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), 10, HERBIVORE_COLOR)
 
 plants = [Plant(random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT)) for _ in range(10)]
+herbivores = [Herbivore(random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT)) for _ in range(5)]
 
 while True:
     for event in pygame.event.get():
@@ -36,6 +48,9 @@ while True:
         
     for plant in plants:
         plant.draw(screen)
+
+    for herbivore in herbivores:
+        herbivore.draw(screen)
 
     pygame.display.update()
     clock.tick(FPS)
