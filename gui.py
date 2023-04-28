@@ -14,6 +14,8 @@ HERBIVORE_COLOR = (0, 0, 255) # Red
 PREDATOR_COLOR = (255, 0, 0) # Blue
 HERBIVORE_SPEED = 2
 HERBIVORE_ENERGY = 50
+PREDATOR_SPEED = 3
+PREDATOR_ENERGY = 200
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
@@ -44,19 +46,33 @@ class Herbivore:
         dy = HERBIVORE_SPEED * math.sin(self.direction)
         self.x += dx
         self.y += dy
-        
+    
+    def turn(self):
+        self.direction += random.uniform(-math.pi / 16, math.pi / 16)
+
 class Predator:
-    def __init__(self, x, y):
+    def __init__(self, x, y, energy):
         self.x = x
         self.y = y
+        self.energy = energy
+        self.direction = random.uniform(0, 2 * math.pi)
 
     def draw(self, screen):
         pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), 10, PREDATOR_COLOR)
         pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), 10, PREDATOR_COLOR)
 
+    def move(self):
+        dx = PREDATOR_SPEED * math.cos(self.direction)
+        dy = PREDATOR_SPEED * math.sin(self.direction)
+        self.x += dx
+        self.y += dy
+    
+    def turn(self):
+        self.direction += random.uniform(-math.pi / 16, math.pi / 16)
+
 plants = [Plant(random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT)) for _ in range(10)]
 herbivores = [Herbivore(random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT), HERBIVORE_ENERGY) for _ in range(5)]
-predators = [Predator(random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT)) for _ in range(3)]
+predators = [Predator(random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT), PREDATOR_ENERGY) for _ in range(3)]
 
 while True:
     for event in pygame.event.get():
@@ -72,9 +88,12 @@ while True:
     for herbivore in herbivores:
         herbivore.draw(screen)
         herbivore.move()
+        herbivore.turn()
     
     for predator in predators:
         predator.draw(screen)
+        predator.move()
+        predator.turn()
 
     pygame.display.update()
     clock.tick(FPS)
