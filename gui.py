@@ -3,10 +3,8 @@ import pygame.gfxdraw
 import random
 import math
 
-# initialize Pygame
 pygame.init()
 
-# define constants
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 FPS = 60
@@ -57,8 +55,18 @@ class Herbivore:
     def move(self):
         dx = HERBIVORE_SPEED * math.cos(self.direction)
         dy = HERBIVORE_SPEED * math.sin(self.direction)
-        self.x += dx
-        self.y += dy
+        new_x = self.x + dx
+        new_y = self.y + dy
+        if new_x > SCREEN_WIDTH:
+            new_x = SCREEN_WIDTH
+        elif new_x < 0:
+            new_x = 0
+        if new_y > SCREEN_HEIGHT:
+            new_y = SCREEN_HEIGHT
+        elif new_y < 0:
+            new_y = 0
+        self.x = new_x
+        self.y = new_y
 
     def turn(self):
         self.direction += random.uniform(-math.pi / 16, math.pi / 16)
@@ -73,7 +81,7 @@ class Herbivore:
 
     def reproduce(self):
         if self.energy >= HERBIVORE_FOOD_THRESHOLD:
-            self.energy /= 2
+            self.energy /= 4
             return Herbivore(self.x, self.y, self.energy)
         else:
             return None
@@ -89,13 +97,22 @@ class Predator:
         pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), 15, PREDATOR_COLOR)
         pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), 15, PREDATOR_COLOR)
 
-
     def move(self):
         dx = PREDATOR_SPEED * math.cos(self.direction)
         dy = PREDATOR_SPEED * math.sin(self.direction)
-        self.x += dx
-        self.y += dy
-
+        new_x = self.x + dx
+        new_y = self.y + dy
+        if new_x > SCREEN_WIDTH:
+            new_x = SCREEN_WIDTH
+        elif new_x < 0:
+            new_x = 0
+        if new_y > SCREEN_HEIGHT:
+            new_y = SCREEN_HEIGHT
+        elif new_y < 0:
+            new_y = 0
+        self.x = new_x
+        self.y = new_y
+    
     def turn(self):
         self.direction += random.uniform(-math.pi / 16, math.pi / 16)
 
@@ -109,7 +126,7 @@ class Predator:
 
     def reproduce(self):
         if self.energy >= PREDATOR_FOOD_THRESHOLD:
-            self.energy /= 2
+            self.energy /= 8
             return Predator(self.x, self.y, self.energy)
         else:
             return None
@@ -139,7 +156,7 @@ while running:
         if new_herbivore is not None:
             herbivores.append(new_herbivore)
 
-        if herbivore.energy <= 0:
+        if herbivore.energy <= 10:
             herbivores.remove(herbivore)
 
     for predator in predators:
@@ -154,7 +171,7 @@ while running:
         if new_predator is not None:
             predators.append(new_predator)
 
-        if predator.energy <= 0:
+        if predator.energy <= 10:
             predators.remove(predator)
 
     screen.fill(BACKGROUND_COLOR)
