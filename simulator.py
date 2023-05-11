@@ -12,21 +12,21 @@ BACKGROUND_COLOR = ('#FFFFFF') # White
 PLANT_COLOR = (0, 255, 0) # Green
 HERBIVORE_COLOR = (0, 0, 255) # Red
 PREDATOR_COLOR = (255, 0, 0) # Blue
-HERBIVORE_SPEED = 2
+HERBIVORE_SPEED = 3
 HERBIVORE_ENERGY = 50
 HERBIVORE_SIGHT_RANGE = 100
 HERBIVORE_FOOD_THRESHOLD = 50
-PREDATOR_SPEED = 2
+PREDATOR_SPEED = 1
 PREDATOR_ENERGY = 200
 PREDATOR_SIGHT_RANGE = 150
 PREDATOR_FOOD_THRESHOLD = 100
 PLANT_ENERGY = 100
 PLANT_GROWTH_RATE = 0.1
-HERBIVORE_ENERGY_COST = 0.01  
+HERBIVORE_ENERGY_COST = 0.7
 PREDATOR_ENERGY_COST = 0.05  
 ENERGY_DEPLETION_FACTOR = 1
 REPRODUCTION_ENERGY_COST = 200
-INITIAL_PLANTS = 20
+INITIAL_PLANTS = 30
 INITIAL_HERBIVORES = 5
 INITIAL_PREDATORS = 1
 PLANT_REPRODUCTION_RATE = 0.01
@@ -35,6 +35,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
 clock = pygame.time.Clock()
 
+
 class Plant:
     def __init__(self, x, y, energy):
         self.x = x
@@ -42,14 +43,14 @@ class Plant:
         self.energy = energy
 
     def draw(self, screen):
-        radius = max(2, min(5, int(self.energy / 20)))
+        radius = max(1, min(3, int(self.energy / 20)))
         pygame.gfxdraw.filled_circle(screen, self.x, self.y, radius, PLANT_COLOR)
         pygame.gfxdraw.aacircle(screen, self.x, self.y, radius, PLANT_COLOR)
 
     def generate_new_plant(plant):
         new_x = plant.x + random.randint(-200, 200)
         new_y = plant.y + random.randint(-200, 200)
-        if 0 <= new_x <= SCREEN_WIDTH and 0 <= new_y <= SCREEN_HEIGHT:
+        if 400 <= new_x <= SCREEN_WIDTH and 0 <= new_y <= SCREEN_HEIGHT - 250:
             return Plant(new_x, new_y, plant.energy / 200)
         else:
             return None
@@ -65,8 +66,8 @@ class Herbivore:
         self.direction = random.uniform(0, 2 * math.pi)
 
     def draw(self, screen):
-        pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), 10, HERBIVORE_COLOR)
-        pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), 10, HERBIVORE_COLOR)
+        pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), 6, HERBIVORE_COLOR)
+        pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), 6, HERBIVORE_COLOR)
 
     def move(self):
         dx = HERBIVORE_SPEED * math.cos(self.direction)
@@ -75,10 +76,10 @@ class Herbivore:
         new_y = self.y + dy
         if new_x > SCREEN_WIDTH:
             new_x = SCREEN_WIDTH
-        elif new_x < 0:
-            new_x = 0
-        if new_y > SCREEN_HEIGHT:
-            new_y = SCREEN_HEIGHT
+        elif new_x < 400:
+            new_x = 400
+        if new_y > SCREEN_HEIGHT - 250:
+            new_y = SCREEN_HEIGHT - 250
         elif new_y < 0:
             new_y = 0
         self.x = new_x
@@ -126,8 +127,8 @@ class Predator:
         self.direction = random.uniform(0, 2 * math.pi)
 
     def draw(self, screen):
-        pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), 15, PREDATOR_COLOR)
-        pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), 15, PREDATOR_COLOR)
+        pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), 10, PREDATOR_COLOR)
+        pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), 10, PREDATOR_COLOR)
 
     def move(self):
         dx = PREDATOR_SPEED * math.cos(self.direction)
@@ -136,10 +137,10 @@ class Predator:
         new_y = self.y + dy
         if new_x > SCREEN_WIDTH:
             new_x = SCREEN_WIDTH
-        elif new_x < 0:
-            new_x = 0
-        if new_y > SCREEN_HEIGHT:
-            new_y = SCREEN_HEIGHT
+        elif new_x < 400:
+            new_x = 400
+        if new_y > SCREEN_HEIGHT - 250:
+            new_y = SCREEN_HEIGHT - 250
         elif new_y < 0:
             new_y = 0
         self.x = new_x
@@ -179,10 +180,9 @@ class Predator:
         else:
             return None
     
-
-plants = [Plant(random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT), PLANT_ENERGY) for _ in range(INITIAL_PLANTS)]
-herbivores = [Herbivore(random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT), HERBIVORE_ENERGY) for _ in range(INITIAL_HERBIVORES)]
-predators = [Predator(random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT), PREDATOR_ENERGY) for _ in range(INITIAL_PREDATORS)]
+plants = [Plant(random.randint(400, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT - 250), PLANT_ENERGY) for _ in range(INITIAL_PLANTS)]
+herbivores = [Herbivore(random.randint(400, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT - 250), HERBIVORE_ENERGY) for _ in range(INITIAL_HERBIVORES)]
+predators = [Predator(random.randint(400, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT - 250), PREDATOR_ENERGY) for _ in range(INITIAL_PREDATORS)]
 
 running = True
 while running:
