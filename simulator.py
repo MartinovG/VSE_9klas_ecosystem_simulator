@@ -14,30 +14,37 @@ BACKGROUND_COLOR = ('#FFFFFF') # White
 PLANT_COLOR = (0, 255, 0) # Green
 HERBIVORE_COLOR = (0, 0, 255) # Red
 PREDATOR_COLOR = (255, 0, 0) # Blue
-HERBIVORE_SPEED = 3
+HERBIVORE_SPEED = 1.0
 HERBIVORE_ENERGY = 50
 HERBIVORE_SIGHT_RANGE = 100
 HERBIVORE_FOOD_THRESHOLD = 50
-PREDATOR_SPEED = 1
-PREDATOR_ENERGY = 200
-PREDATOR_SIGHT_RANGE = 150
-PREDATOR_FOOD_THRESHOLD = 100
+PREDATOR_SPEED = 0.5
+PREDATOR_ENERGY = 150
+PREDATOR_SIGHT_RANGE = 50
+PREDATOR_FOOD_THRESHOLD = 50
 PLANT_ENERGY = 100
-PLANT_GROWTH_RATE = 0.1
-HERBIVORE_ENERGY_COST = 0.7
-PREDATOR_ENERGY_COST = 0.05  
+PLANT_GROWTH_RATE = 0.01
+HERBIVORE_ENERGY_COST = 0.005
+PREDATOR_ENERGY_COST = 0.007 
 ENERGY_DEPLETION_FACTOR = 1
 REPRODUCTION_ENERGY_COST = 200
 base_font = pygame.font.Font(None, 32)
-initial_plants = '0'
-initial_herbivores = '0'
-initial_predators = '0'
-PLANT_REPRODUCTION_RATE = 0.01
-
+initial_plants = '25'
+initial_herbivores = '20'
+initial_predators = '5'
+PLANT_REPRODUCTION_RATE = 0.1
+MATING_ENERGY_THRESHOLD = 150  # Minimum energy required for mating
+OFFSPRING_ENERGY_FACTOR = 0.3  # Percentage of energy transferred to offspring during mating
+BASE_SIZE = 1  # Minimum size of an animal
+SIZE_FACTOR = 0.05  # Determines how much an animal's size changes based on its energy
+MATING_DISTANCE = 5  # Maximum distance between animals for mating to occur
+SEASON_TIMER = 0
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
 clock = pygame.time.Clock()
+
+season_colors = [(0, 255, 127), (35, 110, 150), (156,87,8), (255, 255, 255)] # Spring, Summer, Autumn, Winter
 
 def draw_button(screen, button_rect, text):
     pygame.draw.rect(screen, (100, 100, 100), button_rect, 0)
@@ -90,19 +97,27 @@ class Plant:
         self.energy = min(self.energy + PLANT_GROWTH_RATE * self.energy, 100)
             
 class Herbivore:
-    def __init__(self, x, y, energy):
+    def __init__(self, x, y, energy, color=HERBIVORE_COLOR):
         self.x = x
         self.y = y
         self.energy = energy
-        self.direction = random.uniform(0, 2 * math.pi)
+        self.angle = random.uniform(0, 2 * math.pi)
+        self.gender = random.choice(["male", "female"])
+        self.color = self.adjust_color_by_gender(color)
+
+    def adjust_color_by_gender(self, color):
+        if self.gender == "male":
+            return (30,144,255)  # Darker shade
+        else:
+            return (173, 216, 230)  # Lighter shade
 
     def draw(self, screen):
-        pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), 6, HERBIVORE_COLOR)
-        pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), 6, HERBIVORE_COLOR)
+        size = int(BASE_SIZE + self.energy * SIZE_FACTOR)
+        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), size)
 
     def move(self):
-        dx = HERBIVORE_SPEED * math.cos(self.direction)
-        dy = HERBIVORE_SPEED * math.sin(self.direction)
+        dx = HERBIVORE_SPEED * math.cos(self.angle)
+        dy = HERBIVORE_SPEED * math.sin(self.angle)
         new_x = self.x + dx
         new_y = self.y + dy
         if new_x > SCREEN_WIDTH:
@@ -118,7 +133,7 @@ class Herbivore:
         self.energy *= ENERGY_DEPLETION_FACTOR 
 
     def turn(self):
-        self.direction += random.uniform(-math.pi / 16, math.pi / 16)
+        self.angle += random.uniform(-math.pi / 16, math.pi / 16)
 
     def eat(self, plant):
         distance = math.sqrt((self.x - plant.x) ** 2 + (self.y - plant.y) ** 2)
@@ -139,7 +154,7 @@ class Herbivore:
                 nearest_plant = plant
 
         if nearest_plant is not None:
-            self.direction = math.atan2(nearest_plant.y - self.y, nearest_plant.x - self.x)
+            self.angle = math.atan2(nearest_plant.y - self.y, nearest_plant.x - self.x)
         else:
             self.turn()
 
@@ -150,20 +165,48 @@ class Herbivore:
         else:
             return None
 
+    def mate(self, other):
+        if (self.gender != other.gender) and (self.energy > MATING_ENERGY_THRESHOLD) and (other.energy > MATING_ENERGY_THRESHOLD):
+            offspring_energy = self.energy * OFFSPRING_ENERGY_FACTOR + other.energy * OFFSPRING_ENERGY_FACTOR
+            offspring_color = tuple((c1 + c2) // 2 for c1, c2 in zip(self.color, other.color))
+            offspring = Herbivore(self.x, self.y, offspring_energy, color=offspring_color)
+            self.energy *= (1 - OFFSPRING_ENERGY_FACTOR)
+            other.energy *= (1 - OFFSPRING_ENERGY_FACTOR)
+            return offspring
+        return None
+    
+    def distance_to(self, other):
+        dx = self.x - other.x
+        dy = self.y - other.y
+        return math.sqrt(dx**2 + dy**2)
+
 class Predator:
-    def __init__(self, x, y, energy):
+    def __init__(self, x, y, energy, color=PREDATOR_COLOR):
         self.x = x
         self.y = y
         self.energy = energy
-        self.direction = random.uniform(0, 2 * math.pi)
+        self.angle = random.uniform(0, 2 * math.pi)
+        self.gender = random.choice(["male", "female"])
+        self.color = self.adjust_color_by_gender(color)
+
+    def distance_to(self, other):
+        dx = self.x - other.x
+        dy = self.y - other.y
+        return math.sqrt(dx**2 + dy**2)
+
+    def adjust_color_by_gender(self, color):
+        if self.gender == "male":
+            return (250, 128, 114)  # Darker shade
+        else:
+            return (128, 0, 0)  # Lighter shade
 
     def draw(self, screen):
-        pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), 10, PREDATOR_COLOR)
-        pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), 10, PREDATOR_COLOR)
+        size = int(BASE_SIZE + self.energy * SIZE_FACTOR)
+        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), size)
 
     def move(self):
-        dx = PREDATOR_SPEED * math.cos(self.direction)
-        dy = PREDATOR_SPEED * math.sin(self.direction)
+        dx = PREDATOR_SPEED * math.cos(self.angle)
+        dy = PREDATOR_SPEED * math.sin(self.angle)
         new_x = self.x + dx
         new_y = self.y + dy
         if new_x > SCREEN_WIDTH:
@@ -179,7 +222,7 @@ class Predator:
         self.energy *= ENERGY_DEPLETION_FACTOR  
     
     def turn(self):
-        self.direction += random.uniform(-math.pi / 16, math.pi / 16)
+        self.angle += random.uniform(-math.pi / 16, math.pi / 16)
 
     def eat(self, herbivore):
         distance = math.sqrt((self.x - herbivore.x) ** 2 + (self.y - herbivore.y) ** 2)
@@ -200,7 +243,7 @@ class Predator:
                 nearest_herbivore = herbivore
 
         if nearest_herbivore is not None:
-            self.direction = math.atan2(nearest_herbivore.y - self.y, nearest_herbivore.x - self.x)
+            self.angle = math.atan2(nearest_herbivore.y - self.y, nearest_herbivore.x - self.x)
         else:
             self.turn()
 
@@ -210,24 +253,34 @@ class Predator:
             return Predator(self.x, self.y, self.energy / 2)
         else:
             return None
+        
+    def mate(self, other):
+        if (self.gender != other.gender) and (self.energy > MATING_ENERGY_THRESHOLD) and (other.energy > MATING_ENERGY_THRESHOLD):
+            offspring_energy = self.energy * OFFSPRING_ENERGY_FACTOR + other.energy * OFFSPRING_ENERGY_FACTOR
+            offspring_color = tuple((c1 + c2) // 2 for c1, c2 in zip(self.color, other.color))
+            offspring = Predator(self.x, self.y, offspring_energy, color=offspring_color)
+            self.energy *= (1 - OFFSPRING_ENERGY_FACTOR)
+            other.energy *= (1 - OFFSPRING_ENERGY_FACTOR)
+            return offspring
+        return None    
     
 plants = [Plant(random.randint(400, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT - 250), PLANT_ENERGY) for _ in range(int(initial_plants))]
 herbivores = [Herbivore(random.randint(400, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT - 250), HERBIVORE_ENERGY) for _ in range(int(initial_herbivores))]
 predators = [Predator(random.randint(400, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT - 250), PREDATOR_ENERGY) for _ in range(int(initial_predators))]
 
-input_rect = pygame.Rect(200, 200, 140, 32)
+input_rect = pygame.Rect(200, 200, 140, 32) #plants
 color_active = pygame.Color(144, 238, 144)
 color_passive = pygame.Color(69,139,0)
 color = color_passive
 active = False
 
-input_rect2 = pygame.Rect(200, 250, 140, 32)
+input_rect2 = pygame.Rect(200, 250, 140, 32) #herbivores
 color_active2 = pygame.Color(173, 216, 230)
 color_passive2 = pygame.Color(30,144,255)
 color2 = color_passive2
 active2 = False
 
-input_rect3 = pygame.Rect(200, 300, 140, 32)
+input_rect3 = pygame.Rect(200, 300, 140, 32) #predators
 color_active3 = pygame.Color(250, 128, 114)
 color_passive3 = pygame.Color(128, 0, 0)
 color3 = color_passive3
@@ -287,8 +340,18 @@ while running:
                 if active3:
                     initial_predators += event.unicode
         
+    screen.fill(BACKGROUND_COLOR)
+    draw_button(screen, button_rect, button_text)
+    draw_button2(screen, button_rect2, button_text2)
+    pygame.gfxdraw.rectangle(screen, pygame.Rect(390, SCREEN_HEIGHT - 600, SCREEN_WIDTH, 360), BORDER_COLOR) #simulation border
 
     if not simulation_running:
+
+        current_time = pygame.time.get_ticks()
+        season_index = (current_time // 3000) % len(season_colors)
+        current_season_color = season_colors[season_index]
+        pygame.draw.rect(screen, current_season_color, (391, SCREEN_HEIGHT - 601, SCREEN_WIDTH + 1, 360))
+
         for plant in plants:
             plant.grow()
         
@@ -330,10 +393,23 @@ while running:
             if predator.energy <= 10:
                 predators.remove(predator)
 
-    screen.fill(BACKGROUND_COLOR)
-    draw_button(screen, button_rect, button_text)
-    draw_button2(screen, button_rect2, button_text2)
-    pygame.gfxdraw.rectangle(screen, pygame.Rect(390, SCREEN_HEIGHT - 600, SCREEN_WIDTH, 360), BORDER_COLOR) #simulation border
+        new_herbivores = []
+        new_predators = []
+
+        for h1 in herbivores:
+            for h2 in herbivores:
+                if h1 != h2 and h1.distance_to(h2) < MATING_DISTANCE:
+                    offspring = h1.mate(h2)
+                    if offspring:
+                        new_herbivores.append(offspring)
+
+        for p1 in predators:
+            for p2 in predators:
+                if p1 != p2 and p1.distance_to(p2) < MATING_DISTANCE:
+                    offspring = p1.mate(p2)
+                    if offspring:
+                        new_predators.append(offspring)
+
 
     if not simulation_started:
         if button_text2 == "Begin":
