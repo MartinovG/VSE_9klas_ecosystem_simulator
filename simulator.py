@@ -29,9 +29,9 @@ PREDATOR_ENERGY_COST = 0.007
 ENERGY_DEPLETION_FACTOR = 1
 REPRODUCTION_ENERGY_COST = 200
 base_font = pygame.font.Font(None, 32)
-initial_plants = '25'
-initial_herbivores = '20'
-initial_predators = '5'
+initial_plants = '250'
+initial_herbivores = '0'
+initial_predators = '0'
 PLANT_REPRODUCTION_RATE = 0.1
 MATING_ENERGY_THRESHOLD = 150  # Minimum energy required for mating
 OFFSPRING_ENERGY_FACTOR = 0.3  # Percentage of energy transferred to offspring during mating
@@ -88,7 +88,7 @@ class Plant:
     def generate_new_plant(plant):
         new_x = plant.x + random.randint(-200, 200)
         new_y = plant.y + random.randint(-200, 200)
-        if 400 <= new_x <= SCREEN_WIDTH and 0 <= new_y <= SCREEN_HEIGHT - 250:
+        if 390 <= new_x <= SCREEN_WIDTH and SCREEN_HEIGHT - 590 <= new_y <= SCREEN_HEIGHT - 10:
             return Plant(new_x, new_y, plant.energy / 200)
         else:
             return None
@@ -122,12 +122,12 @@ class Herbivore:
         new_y = self.y + dy
         if new_x > SCREEN_WIDTH:
             new_x = SCREEN_WIDTH
-        elif new_x < 400:
-            new_x = 400
-        if new_y > SCREEN_HEIGHT - 250:
-            new_y = SCREEN_HEIGHT - 250
-        elif new_y < 0:
-            new_y = 0
+        elif new_x < 390:
+            new_x = 390
+        if new_y > SCREEN_HEIGHT - 10:
+            new_y = SCREEN_HEIGHT - 10
+        elif new_y < SCREEN_HEIGHT - 590:
+            new_y = SCREEN_HEIGHT - 590
         self.x = new_x
         self.y = new_y
         self.energy *= ENERGY_DEPLETION_FACTOR 
@@ -211,10 +211,12 @@ class Predator:
         new_y = self.y + dy
         if new_x > SCREEN_WIDTH:
             new_x = SCREEN_WIDTH
-        elif new_x < 400:
-            new_x = 400
-        if new_y > SCREEN_HEIGHT - 250:
-            new_y = SCREEN_HEIGHT - 250
+        elif new_x < 390:
+            new_x = 390
+        if new_y > SCREEN_HEIGHT - 10:
+            new_y = SCREEN_HEIGHT - 10
+        elif new_y < SCREEN_HEIGHT - 590:
+            new_y = SCREEN_HEIGHT - 590
         elif new_y < 0:
             new_y = 0
         self.x = new_x
@@ -264,9 +266,9 @@ class Predator:
             return offspring
         return None    
     
-plants = [Plant(random.randint(400, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT - 250), PLANT_ENERGY) for _ in range(int(initial_plants))]
-herbivores = [Herbivore(random.randint(400, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT - 250), HERBIVORE_ENERGY) for _ in range(int(initial_herbivores))]
-predators = [Predator(random.randint(400, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT - 250), PREDATOR_ENERGY) for _ in range(int(initial_predators))]
+plants = [Plant(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PLANT_ENERGY) for _ in range(int(initial_plants))]
+herbivores = [Herbivore(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), HERBIVORE_ENERGY) for _ in range(int(initial_herbivores))]
+predators = [Predator(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PREDATOR_ENERGY) for _ in range(int(initial_predators))]
 
 input_rect = pygame.Rect(200, 200, 140, 32) #plants
 color_active = pygame.Color(144, 238, 144)
@@ -343,14 +345,14 @@ while running:
     screen.fill(BACKGROUND_COLOR)
     draw_button(screen, button_rect, button_text)
     draw_button2(screen, button_rect2, button_text2)
-    pygame.gfxdraw.rectangle(screen, pygame.Rect(390, SCREEN_HEIGHT - 600, SCREEN_WIDTH, 360), BORDER_COLOR) #simulation border
+    pygame.gfxdraw.rectangle(screen, pygame.Rect(389, SCREEN_HEIGHT - 591, SCREEN_WIDTH, 583), BORDER_COLOR) #simulation border
 
     if not simulation_running:
 
         current_time = pygame.time.get_ticks()
         season_index = (current_time // 3000) % len(season_colors)
         current_season_color = season_colors[season_index]
-        pygame.draw.rect(screen, current_season_color, (391, SCREEN_HEIGHT - 601, SCREEN_WIDTH + 1, 360))
+        pygame.draw.rect(screen, current_season_color, (390, SCREEN_HEIGHT - 590, SCREEN_WIDTH - 10, 580))
 
         for plant in plants:
             plant.grow()
@@ -422,9 +424,9 @@ while running:
             for predator in predators:
                 predator.draw(screen)
     elif button_text2 == "Finish":
-        plants = [Plant(random.randint(400, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT - 250), PLANT_ENERGY) for _ in range(int(initial_plants))]
-        herbivores = [Herbivore(random.randint(400, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT - 250), HERBIVORE_ENERGY) for _ in range(int(initial_herbivores))]
-        predators = [Predator(random.randint(400, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT - 250), PREDATOR_ENERGY) for _ in range(int(initial_predators))]
+        plants = [Plant(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PLANT_ENERGY) for _ in range(int(initial_plants))]
+        herbivores = [Herbivore(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), HERBIVORE_ENERGY) for _ in range(int(initial_herbivores))]
+        predators = [Predator(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PREDATOR_ENERGY) for _ in range(int(initial_predators))]
         simulation_started = False
         button_text2 = "Begin"
 
