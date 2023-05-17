@@ -32,19 +32,16 @@ base_font = pygame.font.Font(None, 32)
 initial_plants = '250'
 initial_herbivores = '0'
 initial_predators = '0'
-PLANT_REPRODUCTION_RATE = 0.1
+PLANT_REPRODUCTION_RATE = 0.01
 MATING_ENERGY_THRESHOLD = 150  # Minimum energy required for mating
 OFFSPRING_ENERGY_FACTOR = 0.3  # Percentage of energy transferred to offspring during mating
 BASE_SIZE = 1  # Minimum size of an animal
 SIZE_FACTOR = 0.05  # Determines how much an animal's size changes based on its energy
 MATING_DISTANCE = 5  # Maximum distance between animals for mating to occur
-SEASON_TIMER = 0
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
 clock = pygame.time.Clock()
-
-season_colors = [(0, 255, 127), (35, 110, 150), (156,87,8), (255, 255, 255)] # Spring, Summer, Autumn, Winter
 
 def draw_button(screen, button_rect, text):
     pygame.draw.rect(screen, (100, 100, 100), button_rect, 0)
@@ -349,11 +346,6 @@ while running:
 
     if not simulation_running:
 
-        current_time = pygame.time.get_ticks()
-        season_index = (current_time // 3000) % len(season_colors)
-        current_season_color = season_colors[season_index]
-        pygame.draw.rect(screen, current_season_color, (390, SCREEN_HEIGHT - 590, SCREEN_WIDTH - 10, 580))
-
         for plant in plants:
             plant.grow()
         
@@ -361,8 +353,7 @@ while running:
                 new_plant = plant.generate_new_plant()
                 if new_plant is not None:
                     plants.append(new_plant)
-
-
+                    
         for herbivore in herbivores:
             herbivore.move_towards_food(plants)
             herbivore.move()
