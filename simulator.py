@@ -43,16 +43,8 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
 clock = pygame.time.Clock()
 
-def draw_button(screen, button_rect, text):
-    pygame.draw.rect(screen, (100, 100, 100), button_rect, 0)
-    pygame.draw.rect(screen, (200, 200, 200), button_rect, 1)
 
-    font = pygame.font.Font(None, 24)
-    label = font.render(text, 1, (255, 255, 255))
-    screen.blit(label, (button_rect.x + button_rect.width // 2 - label.get_width() // 2,
-                        button_rect.y + button_rect.height // 2 - label.get_height() // 2))
-
-def draw_button2(screen, button_rect, text):
+def draw_button(screen, button_rect, text): #pause button
     pygame.draw.rect(screen, (100, 100, 100), button_rect, 0)
     pygame.draw.rect(screen, (200, 200, 200), button_rect, 1)
 
@@ -341,7 +333,7 @@ while running:
         
     screen.fill(BACKGROUND_COLOR)
     draw_button(screen, button_rect, button_text)
-    draw_button2(screen, button_rect2, button_text2)
+    draw_button(screen, button_rect2, button_text2)
     pygame.gfxdraw.rectangle(screen, pygame.Rect(389, SCREEN_HEIGHT - 591, SCREEN_WIDTH, 583), BORDER_COLOR) #simulation border
 
     if not simulation_running:
@@ -353,6 +345,7 @@ while running:
                 new_plant = plant.generate_new_plant()
                 if new_plant is not None:
                     plants.append(new_plant)
+                    
                     
         for herbivore in herbivores:
             herbivore.move_towards_food(plants)
@@ -436,17 +429,17 @@ while running:
     else:
         color3 = color_passive3
 
-    pygame.draw.rect(screen, color, input_rect)
+    pygame.draw.rect(screen, color, input_rect) #plants
     text_surface = base_font.render(initial_plants, True, (255, 255, 255))
     screen.blit(text_surface, (input_rect.x+5, input_rect.y+5))
     input_rect.w = max(100, text_surface.get_width()+10)
 
-    pygame.draw.rect(screen, color2, input_rect2)
+    pygame.draw.rect(screen, color2, input_rect2) #herbivores
     text_surface = base_font.render(initial_herbivores, True, (255, 255, 255))
     screen.blit(text_surface, (input_rect2.x+5, input_rect2.y+5))
     input_rect2.w = max(100, text_surface.get_width()+10)
 
-    pygame.draw.rect(screen, color3, input_rect3)
+    pygame.draw.rect(screen, color3, input_rect3) #predators
     text_surface = base_font.render(initial_predators, True, (255, 255, 255))
     screen.blit(text_surface, (input_rect3.x+5, input_rect3.y+5))
     input_rect3.w = max(100, text_surface.get_width()+10)
