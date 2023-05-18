@@ -43,8 +43,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
 clock = pygame.time.Clock()
 
-
-def draw_button(screen, button_rect, text): #pause button
+def draw_button(screen, button_rect, text): #simulation control buttons
     pygame.draw.rect(screen, (100, 100, 100), button_rect, 0)
     pygame.draw.rect(screen, (200, 200, 200), button_rect, 1)
 
@@ -52,6 +51,12 @@ def draw_button(screen, button_rect, text): #pause button
     label = font.render(text, 1, (255, 255, 255))
     screen.blit(label, (button_rect.x + button_rect.width // 2 - label.get_width() // 2,
                         button_rect.y + button_rect.height // 2 - label.get_height() // 2))
+
+def draw_text_box(screen, base_font, text, color, input_rect): #animal number control text boxes
+    pygame.draw.rect(screen, color, input_rect)
+    text_surface = base_font.render(text, True, (255, 255, 255))
+    screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
+    input_rect.w = max(100, text_surface.get_width() + 10)
 
 button_width, button_height = 100, 40
 button_x, button_y = 110, 10
@@ -429,20 +434,9 @@ while running:
     else:
         color3 = color_passive3
 
-    pygame.draw.rect(screen, color, input_rect) #plants
-    text_surface = base_font.render(initial_plants, True, (255, 255, 255))
-    screen.blit(text_surface, (input_rect.x+5, input_rect.y+5))
-    input_rect.w = max(100, text_surface.get_width()+10)
-
-    pygame.draw.rect(screen, color2, input_rect2) #herbivores
-    text_surface = base_font.render(initial_herbivores, True, (255, 255, 255))
-    screen.blit(text_surface, (input_rect2.x+5, input_rect2.y+5))
-    input_rect2.w = max(100, text_surface.get_width()+10)
-
-    pygame.draw.rect(screen, color3, input_rect3) #predators
-    text_surface = base_font.render(initial_predators, True, (255, 255, 255))
-    screen.blit(text_surface, (input_rect3.x+5, input_rect3.y+5))
-    input_rect3.w = max(100, text_surface.get_width()+10)
+    draw_text_box(screen, base_font, initial_plants, color, input_rect) #plants
+    draw_text_box(screen, base_font, initial_herbivores, color2, input_rect2) #herbivores
+    draw_text_box(screen, base_font, initial_predators, color3, input_rect3) #predators
 	
     pygame.display.flip()
     clock.tick(FPS)
