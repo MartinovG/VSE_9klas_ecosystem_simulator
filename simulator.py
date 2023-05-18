@@ -30,14 +30,14 @@ ENERGY_DEPLETION_FACTOR = 1
 REPRODUCTION_ENERGY_COST = 200
 base_font = pygame.font.Font(None, 32)
 initial_plants = '250'
-initial_herbivores = '0'
-initial_predators = '0'
+initial_herbivores = '50'
+initial_predators = '10'
+temperature = '0'
 PLANT_REPRODUCTION_RATE = 0.01
-MATING_ENERGY_THRESHOLD = 150  # Minimum energy required for mating
-OFFSPRING_ENERGY_FACTOR = 0.3  # Percentage of energy transferred to offspring during mating
-BASE_SIZE = 1  # Minimum size of an animal
+MATING_ENERGY_THRESHOLD = 15000  # Minimum energy required for mating
+OFFSPRING_ENERGY_FACTOR = 0.2  # Percentage of energy transferred to offspring during mating
 SIZE_FACTOR = 0.05  # Determines how much an animal's size changes based on its energy
-MATING_DISTANCE = 5  # Maximum distance between animals for mating to occur
+MATING_DISTANCE = 2  # Maximum distance between animals for mating to occur
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
@@ -106,7 +106,11 @@ class Herbivore:
             return (173, 216, 230)  # Lighter shade
 
     def draw(self, screen):
-        size = int(BASE_SIZE + self.energy * SIZE_FACTOR)
+        MALE_SIZE = 9
+        FEMALE_SIZE = 6
+
+        size = MALE_SIZE if self.gender == 'male' else FEMALE_SIZE
+
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), size)
 
     def move(self):
@@ -190,12 +194,16 @@ class Predator:
 
     def adjust_color_by_gender(self, color):
         if self.gender == "male":
-            return (250, 128, 114)  # Darker shade
+            return (128, 0, 0)  # Darker shade
         else:
-            return (128, 0, 0)  # Lighter shade
+            return (250, 128, 114)  # Lighter shade
 
     def draw(self, screen):
-        size = int(BASE_SIZE + self.energy * SIZE_FACTOR)
+        MALE_SIZE = 10
+        FEMALE_SIZE = 7
+
+        size = MALE_SIZE if self.gender == 'male' else FEMALE_SIZE
+
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), size)
 
     def move(self):
@@ -264,23 +272,29 @@ plants = [Plant(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT 
 herbivores = [Herbivore(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), HERBIVORE_ENERGY) for _ in range(int(initial_herbivores))]
 predators = [Predator(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PREDATOR_ENERGY) for _ in range(int(initial_predators))]
 
-input_rect = pygame.Rect(200, 200, 140, 32) #plants
+input_rect = pygame.Rect(10, 200, 140, 32) #plants
 color_active = pygame.Color(144, 238, 144)
 color_passive = pygame.Color(69,139,0)
 color = color_passive
 active = False
 
-input_rect2 = pygame.Rect(200, 250, 140, 32) #herbivores
+input_rect2 = pygame.Rect(10, 250, 140, 32) #herbivores
 color_active2 = pygame.Color(173, 216, 230)
 color_passive2 = pygame.Color(30,144,255)
 color2 = color_passive2
 active2 = False
 
-input_rect3 = pygame.Rect(200, 300, 140, 32) #predators
+input_rect3 = pygame.Rect(10, 300, 140, 32) #predators
 color_active3 = pygame.Color(250, 128, 114)
 color_passive3 = pygame.Color(128, 0, 0)
 color3 = color_passive3
 active3 = False
+
+input_rect4 = pygame.Rect(10, 350, 140, 32) #temperature
+color_active4 = pygame.Color(192, 192, 192)
+color_passive4 = pygame.Color(105,105,105)
+color4 = color_passive4
+active4 = False
 
 running = True
 while running:
@@ -318,6 +332,12 @@ while running:
             else:
                 active3 = False
 
+        if event.type == pygame.MOUSEBUTTONDOWN: #temperature
+            if input_rect4.collidepoint(event.pos):
+                active4 = True
+            else:
+                active4 = False
+
 
         if event.type == pygame.KEYDOWN:
 
@@ -328,6 +348,8 @@ while running:
                     initial_herbivores = initial_herbivores[:-1]
                 if active3:
                     initial_predators = initial_predators[:-1]
+                if active4:
+                    temperature = temperature[:-1]
             else:
                 if active:
                     initial_plants += event.unicode
@@ -335,7 +357,9 @@ while running:
                     initial_herbivores += event.unicode
                 if active3:
                     initial_predators += event.unicode
-        
+                if active4:
+                    temperature += event.unicode
+               
     screen.fill(BACKGROUND_COLOR)
     draw_button(screen, button_rect, button_text)
     draw_button(screen, button_rect2, button_text2)
@@ -401,7 +425,6 @@ while running:
                     if offspring:
                         new_predators.append(offspring)
 
-
     if not simulation_started:
         if button_text2 == "Begin":
             for plant in plants:
@@ -434,10 +457,16 @@ while running:
     else:
         color3 = color_passive3
 
+    if active4:
+        color4 = color_active4
+    else:
+        color4 = color_passive4
+
     draw_text_box(screen, base_font, initial_plants, color, input_rect) #plants
     draw_text_box(screen, base_font, initial_herbivores, color2, input_rect2) #herbivores
     draw_text_box(screen, base_font, initial_predators, color3, input_rect3) #predators
-	
+    draw_text_box(screen, base_font, temperature, color4, input_rect4) #temperature
+
     pygame.display.flip()
     clock.tick(FPS)
 
