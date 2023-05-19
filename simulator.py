@@ -3,6 +3,7 @@ import pygame.gfxdraw
 import random
 import math
 import sys
+from variables import *
 
 pygame.init()
 
@@ -15,7 +16,7 @@ PLANT_COLOR = (0, 255, 0) # Green
 HERBIVORE_COLOR = (0, 0, 255) # Red
 PREDATOR_COLOR = (255, 0, 0) # Blue
 HERBIVORE_SPEED = 1.0
-HERBIVORE_ENERGY = 50
+HERBIVORE_ENERGY = 100
 HERBIVORE_SIGHT_RANGE = 100
 HERBIVORE_FOOD_THRESHOLD = 50
 PREDATOR_SPEED = 0.5
@@ -57,16 +58,6 @@ def draw_text_box(screen, base_font, text, color, input_rect): #animal number co
     text_surface = base_font.render(text, True, (255, 255, 255))
     screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
     input_rect.w = max(100, text_surface.get_width() + 10)
-
-button_width, button_height = 100, 40
-button_x, button_y = 110, 10
-button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
-simulation_running = True
-button_text = "Start"
-button_x2, button_y2 = 10, 10
-button_rect2 = pygame.Rect(button_x2, button_y2, button_width, button_height)
-simulation_started = True
-button_text2 = "Finish"
 
 class Plant:
     def __init__(self, x, y, energy):
@@ -272,30 +263,6 @@ plants = [Plant(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT 
 herbivores = [Herbivore(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), HERBIVORE_ENERGY) for _ in range(int(initial_herbivores))]
 predators = [Predator(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PREDATOR_ENERGY) for _ in range(int(initial_predators))]
 
-input_rect = pygame.Rect(10, 200, 140, 32) #plants
-color_active = pygame.Color(144, 238, 144)
-color_passive = pygame.Color(69,139,0)
-color = color_passive
-active = False
-
-input_rect2 = pygame.Rect(10, 250, 140, 32) #herbivores
-color_active2 = pygame.Color(173, 216, 230)
-color_passive2 = pygame.Color(30,144,255)
-color2 = color_passive2
-active2 = False
-
-input_rect3 = pygame.Rect(10, 300, 140, 32) #predators
-color_active3 = pygame.Color(250, 128, 114)
-color_passive3 = pygame.Color(128, 0, 0)
-color3 = color_passive3
-active3 = False
-
-input_rect4 = pygame.Rect(10, 350, 140, 32) #temperature
-color_active4 = pygame.Color(192, 192, 192)
-color_passive4 = pygame.Color(105,105,105)
-color4 = color_passive4
-active4 = False
-
 running = True
 while running:
     for event in pygame.event.get():
@@ -389,7 +356,7 @@ while running:
             if new_herbivore is not None:
                 herbivores.append(new_herbivore)
 
-            if herbivore.energy <= 10:
+            if herbivore.energy <= 50:
                 herbivores.remove(herbivore)
 
         for predator in predators:
@@ -405,7 +372,7 @@ while running:
             if new_predator is not None:
                 predators.append(new_predator)
 
-            if predator.energy <= 10:
+            if predator.energy <= 50:
                 predators.remove(predator)
 
         new_herbivores = []
