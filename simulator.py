@@ -4,6 +4,7 @@ import random
 import math
 import sys
 from variables import *
+import os
 
 pygame.init()
 
@@ -37,7 +38,6 @@ temperature = '0'
 PLANT_REPRODUCTION_RATE = 0.01
 MATING_ENERGY_THRESHOLD = 15000  # Minimum energy required for mating
 OFFSPRING_ENERGY_FACTOR = 0.2  # Percentage of energy transferred to offspring during mating
-SIZE_FACTOR = 0.05  # Determines how much an animal's size changes based on its energy
 MATING_DISTANCE = 2  # Maximum distance between animals for mating to occur
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -334,6 +334,18 @@ while running:
 
     if not simulation_running:
 
+        if -20 <= int(temperature) <= 20:
+            HERBIVORE_SPEED = 0.1 + (int(temperature) + 20) * (1 - 0.1) / (20 - (-20))
+            PREDATOR_SPEED = 0.1 + (int(temperature) + 20) * (0.5 - 0.1) / (20 - (-20))
+        elif 20 < int(temperature) <= 50:
+            HERBIVORE_SPEED = 1 - (int(temperature) - 20) * (1 - 0.1) / (50 - 20)
+            PREDATOR_SPEED = 0.5 - (int(temperature) - 20) * (0.5 - 0.1) / (50 - 20)
+        else:
+            HERBIVORE_SPEED = 0.1
+            PREDATOR_SPEED = 0.1
+        if int(temperature) <= -25 or int(temperature) >= 55:
+            ENERGY_DEPLETION_FACTOR = 0.001
+
         for plant in plants:
             plant.grow()
         
@@ -341,7 +353,6 @@ while running:
                 new_plant = plant.generate_new_plant()
                 if new_plant is not None:
                     plants.append(new_plant)
-                    
                     
         for herbivore in herbivores:
             herbivore.move_towards_food(plants)
