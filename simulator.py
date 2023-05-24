@@ -40,15 +40,23 @@ PLANT_REPRODUCTION_RATE = 0.01
 MATING_ENERGY_THRESHOLD = 15000  # Minimum energy required for mating
 OFFSPRING_ENERGY_FACTOR = 0.2  # Percentage of energy transferred to offspring during mating
 MATING_DISTANCE = 2  # Maximum distance between animals for mating to occur
-
-DARK_GREEN = (0, 100, 0)
-BLUE = (0, 0, 255)  
+#DARK_GREEN = (0, 100, 0)
+#BLUE = (0, 0, 255)  
+start_x = SCREEN_WIDTH - 500
+start_y = SCREEN_HEIGHT - 500 
+image_x = start_x
+image_y = start_y
+area_x, area_y, area_w, area_h = 390, SCREEN_HEIGHT - 590, SCREEN_WIDTH - 390, 590
+pygame.font.init()
+font = pygame.font.Font(None, 36)
+text = font.render("Drop here", True, (0, 0, 0))
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
 clock = pygame.time.Clock()
+image = pygame.image.load("tornado.png")
 
-def generate_perlin_noise(width, height, scale):
+'''def generate_perlin_noise(width, height, scale):
     noise_array = []
     for y in range(height):
         row = []
@@ -56,9 +64,9 @@ def generate_perlin_noise(width, height, scale):
             value = noise.pnoise2(x/scale, y/scale, octaves=6, persistence=0.5, lacunarity=2.0, repeatx=1024, repeaty=1024, base=0)
             row.append(value)
         noise_array.append(row)
-    return noise_array
+    return noise_array'''
 
-def draw_pond(noise_array, scale, threshold):
+'''def draw_pond(noise_array, scale, threshold):
     for y in range(len(noise_array)):
         for x in range(len(noise_array[y])):
             if noise_array[y][x] < threshold:
@@ -70,7 +78,7 @@ def draw_pond(noise_array, scale, threshold):
                 pond_x = x * scale + 390  # Adjust x-coordinate based on the starting boundary
                 pond_y = y * scale + (SCREEN_HEIGHT - 590)  # Adjust y-coordinate based on the starting and ending boundaries
                 if pond_y < 590:  # Check if the y-coordinate is within the ending boundary
-                    pygame.draw.rect(screen, BLUE, (pond_x, pond_y, scale, scale))
+                    pygame.draw.rect(screen, BLUE, (pond_x, pond_y, scale, scale))'''
 
 def draw_button(screen, button_rect, text): #simulation control buttons
     pygame.draw.rect(screen, (100, 100, 100), button_rect, 0)
@@ -294,12 +302,33 @@ herbivores = [Herbivore(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN
 predators = [Predator(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PREDATOR_ENERGY) for _ in range(int(initial_predators))]
 
 running = True
+dragging = False
 while running:
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             running = False
             sys.exit()
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = event.pos
+            if image_x <= mouse_x <= image_x + image.get_width() and image_y <= mouse_y <= image_y + image.get_height():
+                dragging = True
+                mouse_offset_x = mouse_x - image_x
+                mouse_offset_y = mouse_y - image_y
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if dragging:
+                if area_x <= image_x <= area_x + area_w - image.get_width() and area_y <= image_y <= area_y + area_h - image.get_height():
+                    image_x, image_y = start_x, start_y
+                    image = pygame.image.load("tornado.png")
+                else:
+                    image_x, image_y = start_x, start_y
+            dragging = False
+        elif event.type == pygame.MOUSEMOTION:
+            if dragging:
+                mouse_x, mouse_y = event.pos
+                image_x = mouse_x - mouse_offset_x
+                image_y = mouse_y - mouse_offset_y
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if button_rect.collidepoint(event.pos):
@@ -356,10 +385,11 @@ while running:
                     initial_predators += event.unicode
                 if active4:
                     temperature += event.unicode
-      
+
     screen.fill(BACKGROUND_COLOR)
-    noise_array = generate_perlin_noise(SCREEN_WIDTH // 5, SCREEN_HEIGHT // 5, scale=30)
-    draw_pond(noise_array, scale=5, threshold=0.15)   
+    screen.blit(image, (image_x, image_y))
+    #noise_array = generate_perlin_noise(SCREEN_WIDTH // 7, SCREEN_HEIGHT // 5, scale=15)
+    #draw_pond(noise_array, scale=5, threshold=0.15)   
     draw_button(screen, button_rect, button_text)
     draw_button(screen, button_rect2, button_text2)
     pygame.gfxdraw.rectangle(screen, pygame.Rect(389, SCREEN_HEIGHT - 591, SCREEN_WIDTH, 583), BORDER_COLOR) #simulation border
@@ -476,6 +506,9 @@ while running:
     draw_text_box(screen, base_font, initial_herbivores, color2, input_rect2) #herbivores
     draw_text_box(screen, base_font, initial_predators, color3, input_rect3) #predators
     draw_text_box(screen, base_font, temperature, color4, input_rect4) #temperature
+
+    if dragging and area_x <= image_x <= area_x + area_w - image.get_width() and area_y <= image_y <= area_y + area_h - image.get_height():
+        screen.blit(text, (area_x + (area_w - text.get_width()) // 2, area_y + (area_h - text.get_height()) // 2))
 
     pygame.display.flip()
     clock.tick(FPS)
