@@ -42,10 +42,12 @@ OFFSPRING_ENERGY_FACTOR = 0.2  # Percentage of energy transferred to offspring d
 MATING_DISTANCE = 2  # Maximum distance between animals for mating to occur
 #DARK_GREEN = (0, 100, 0)
 #BLUE = (0, 0, 255)  
-start_x = SCREEN_WIDTH - 500
-start_y = SCREEN_HEIGHT - 500 
-image_x = start_x
-image_y = start_y
+start_x1 = SCREEN_WIDTH - 500
+start_y1 = SCREEN_HEIGHT - 500 
+start_x2 = SCREEN_WIDTH - 500 
+start_y2 = SCREEN_HEIGHT - 400
+image1_x, image1_y = start_x1, start_y1
+image2_x, image2_y = start_x2, start_y2
 area_x, area_y, area_w, area_h = 390, SCREEN_HEIGHT - 590, SCREEN_WIDTH - 390, 590
 pygame.font.init()
 font = pygame.font.Font(None, 36)
@@ -54,7 +56,8 @@ text = font.render("Drop here", True, (0, 0, 0))
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
 clock = pygame.time.Clock()
-image = pygame.image.load("tornado.png")
+image1 = pygame.image.load("tornado.png")
+image2 = pygame.image.load("fire.png")
 
 '''def generate_perlin_noise(width, height, scale):
     noise_array = []
@@ -302,7 +305,8 @@ herbivores = [Herbivore(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN
 predators = [Predator(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PREDATOR_ENERGY) for _ in range(int(initial_predators))]
 
 running = True
-dragging = False
+dragging1 = False
+dragging2 = False
 while running:
     for event in pygame.event.get():
 
@@ -312,23 +316,44 @@ while running:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
-            if image_x <= mouse_x <= image_x + image.get_width() and image_y <= mouse_y <= image_y + image.get_height():
-                dragging = True
-                mouse_offset_x = mouse_x - image_x
-                mouse_offset_y = mouse_y - image_y
+
+            if image1_x <= mouse_x <= image1_x + image1.get_width() and image1_y <= mouse_y <= image1_y + image1.get_height():
+                dragging1 = True
+                mouse_offset_x1 = mouse_x - image1_x
+                mouse_offset_y1 = mouse_y - image1_y
+
+            if image2_x <= mouse_x <= image2_x + image2.get_width() and image2_y <= mouse_y <= image2_y + image2.get_height():
+                dragging2 = True
+                mouse_offset_x2 = mouse_x - image2_x
+                mouse_offset_y2 = mouse_y - image2_y
+
         elif event.type == pygame.MOUSEBUTTONUP:
-            if dragging:
-                if area_x <= image_x <= area_x + area_w - image.get_width() and area_y <= image_y <= area_y + area_h - image.get_height():
-                    image_x, image_y = start_x, start_y
-                    image = pygame.image.load("tornado.png")
+            if dragging1:
+                if area_x <= image1_x <= area_x + area_w - image1.get_width() and area_y <= image1_y <= area_y + area_h - image1.get_height():
+                    image1_x, image1_y = start_x1, start_y1
+                    image1 = pygame.image.load("tornado.png")
                 else:
-                    image_x, image_y = start_x, start_y
-            dragging = False
+                    image1_x, image1_y = start_x1, start_y1
+                dragging1 = False
+
+            if dragging2:
+                if area_x <= image2_x <= area_x + area_w - image2.get_width() and area_y <= image2_y <= area_y + area_h - image2.get_height():
+                    image2_x, image2_y = start_x2, start_y2
+                    image2 = pygame.image.load("fire.png")
+                else:
+                    image2_x, image2_y = start_x2, start_y2
+                dragging2 = False
+
         elif event.type == pygame.MOUSEMOTION:
-            if dragging:
+            if dragging1:
                 mouse_x, mouse_y = event.pos
-                image_x = mouse_x - mouse_offset_x
-                image_y = mouse_y - mouse_offset_y
+                image1_x = mouse_x - mouse_offset_x1
+                image1_y = mouse_y - mouse_offset_y1
+
+            if dragging2:
+                mouse_x, mouse_y = event.pos
+                image2_x = mouse_x - mouse_offset_x2
+                image2_y = mouse_y - mouse_offset_y2
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if button_rect.collidepoint(event.pos):
@@ -387,7 +412,8 @@ while running:
                     temperature += event.unicode
 
     screen.fill(BACKGROUND_COLOR)
-    screen.blit(image, (image_x, image_y))
+    screen.blit(image1, (image1_x, image1_y))
+    screen.blit(image2, (image2_x, image2_y))
     #noise_array = generate_perlin_noise(SCREEN_WIDTH // 7, SCREEN_HEIGHT // 5, scale=15)
     #draw_pond(noise_array, scale=5, threshold=0.15)   
     draw_button(screen, button_rect, button_text)
@@ -507,7 +533,8 @@ while running:
     draw_text_box(screen, base_font, initial_predators, color3, input_rect3) #predators
     draw_text_box(screen, base_font, temperature, color4, input_rect4) #temperature
 
-    if dragging and area_x <= image_x <= area_x + area_w - image.get_width() and area_y <= image_y <= area_y + area_h - image.get_height():
+    if (dragging1 and area_x <= image1_x <= area_x + area_w - image1.get_width() and area_y <= image1_y <= area_y + area_h - image1.get_height()) or \
+       (dragging2 and area_x <= image2_x <= area_x + area_w - image2.get_width() and area_y <= image2_y <= area_y + area_h - image2.get_height()):
         screen.blit(text, (area_x + (area_w - text.get_width()) // 2, area_y + (area_h - text.get_height()) // 2))
 
     pygame.display.flip()
