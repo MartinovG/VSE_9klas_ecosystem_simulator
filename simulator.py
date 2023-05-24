@@ -4,7 +4,7 @@ import random
 import math
 import sys
 from variables import *
-import os
+import noise
 
 pygame.init()
 
@@ -16,6 +16,7 @@ BACKGROUND_COLOR = ('#FFFFFF') # White
 PLANT_COLOR = (0, 255, 0) # Green
 HERBIVORE_COLOR = (0, 0, 255) # Red
 PREDATOR_COLOR = (255, 0, 0) # Blue
+PLANT_COLOR2 = (128, 0, 128) # Purple
 HERBIVORE_SPEED = 1.0
 HERBIVORE_ENERGY = 100
 HERBIVORE_SIGHT_RANGE = 100
@@ -40,9 +41,36 @@ MATING_ENERGY_THRESHOLD = 15000  # Minimum energy required for mating
 OFFSPRING_ENERGY_FACTOR = 0.2  # Percentage of energy transferred to offspring during mating
 MATING_DISTANCE = 2  # Maximum distance between animals for mating to occur
 
+DARK_GREEN = (0, 100, 0)
+BLUE = (0, 0, 255)  
+
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
 clock = pygame.time.Clock()
+
+def generate_perlin_noise(width, height, scale):
+    noise_array = []
+    for y in range(height):
+        row = []
+        for x in range(width):
+            value = noise.pnoise2(x/scale, y/scale, octaves=6, persistence=0.5, lacunarity=2.0, repeatx=1024, repeaty=1024, base=0)
+            row.append(value)
+        noise_array.append(row)
+    return noise_array
+
+def draw_pond(noise_array, scale, threshold):
+    for y in range(len(noise_array)):
+        for x in range(len(noise_array[y])):
+            if noise_array[y][x] < threshold:
+                pond_x = x * scale + 390  # Adjust x-coordinate based on the starting boundary
+                pond_y = y * scale + (SCREEN_HEIGHT - 590)  # Adjust y-coordinate based on the starting and ending boundaries
+                if pond_y < 590:  # Check if the y-coordinate is within the ending boundary
+                    pygame.draw.rect(screen, DARK_GREEN, (pond_x, pond_y, scale, scale))
+            else:
+                pond_x = x * scale + 390  # Adjust x-coordinate based on the starting boundary
+                pond_y = y * scale + (SCREEN_HEIGHT - 590)  # Adjust y-coordinate based on the starting and ending boundaries
+                if pond_y < 590:  # Check if the y-coordinate is within the ending boundary
+                    pygame.draw.rect(screen, BLUE, (pond_x, pond_y, scale, scale))
 
 def draw_button(screen, button_rect, text): #simulation control buttons
     pygame.draw.rect(screen, (100, 100, 100), button_rect, 0)
@@ -66,9 +94,11 @@ class Plant:
         self.energy = energy
 
     def draw(self, screen):
-        radius = max(1, min(3, int(self.energy / 20)))
+        radius = max(2, min(4, int(self.energy / 20)))
         pygame.gfxdraw.filled_circle(screen, self.x, self.y, radius, PLANT_COLOR)
         pygame.gfxdraw.aacircle(screen, self.x, self.y, radius, PLANT_COLOR)
+        pygame.gfxdraw.aacircle(screen, self.x, self.y, radius - 2 , PLANT_COLOR2)
+        pygame.gfxdraw.filled_circle(screen, self.x, self.y, radius - 2, PLANT_COLOR2)
 
     def generate_new_plant(plant):
         new_x = plant.x + random.randint(-200, 200)
@@ -326,8 +356,10 @@ while running:
                     initial_predators += event.unicode
                 if active4:
                     temperature += event.unicode
-               
+      
     screen.fill(BACKGROUND_COLOR)
+    noise_array = generate_perlin_noise(SCREEN_WIDTH // 5, SCREEN_HEIGHT // 5, scale=30)
+    draw_pond(noise_array, scale=5, threshold=0.15)   
     draw_button(screen, button_rect, button_text)
     draw_button(screen, button_rect2, button_text2)
     pygame.gfxdraw.rectangle(screen, pygame.Rect(389, SCREEN_HEIGHT - 591, SCREEN_WIDTH, 583), BORDER_COLOR) #simulation border
