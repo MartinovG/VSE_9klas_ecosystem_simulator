@@ -4,7 +4,6 @@ import random
 import math
 import sys
 from variables import *
-import noise
 
 pygame.init()
 
@@ -37,9 +36,9 @@ initial_herbivores = '50'
 initial_predators = '10'
 temperature = '0'
 PLANT_REPRODUCTION_RATE = 0.01
-MATING_ENERGY_THRESHOLD = 15000  # Minimum energy required for mating
-OFFSPRING_ENERGY_FACTOR = 0.2  # Percentage of energy transferred to offspring during mating
-MATING_DISTANCE = 2  # Maximum distance between animals for mating to occur
+MATING_ENERGY_THRESHOLD = 15000  
+OFFSPRING_ENERGY_FACTOR = 0.2  
+MATING_DISTANCE = 2  
 #DARK_GREEN = (0, 100, 0)
 #BLUE = (0, 0, 255)  
 start_x1 = SCREEN_WIDTH - 500
@@ -52,12 +51,17 @@ area_x, area_y, area_w, area_h = 390, SCREEN_HEIGHT - 590, SCREEN_WIDTH - 390, 5
 pygame.font.init()
 font = pygame.font.Font(None, 36)
 text = font.render("Drop here", True, (0, 0, 0))
+radius = 200  
+speed = 0.012  
+attraction_speed = 0.05 
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
 clock = pygame.time.Clock()
 image1 = pygame.image.load("tornado.png")
 image2 = pygame.image.load("fire.png")
+
+angles = [random.uniform(0, 2 * math.pi) for _ in range(int(initial_plants))]
 
 '''def generate_perlin_noise(width, height, scale):
     noise_array = []
@@ -98,6 +102,21 @@ def draw_text_box(screen, base_font, text, color, input_rect): #animal number co
     screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
     input_rect.w = max(100, text_surface.get_width() + 10)
 
+def tornado(plants, mouse_x, mouse_y, radius, speed, attraction_speed):
+    for i, plant in enumerate(plants):
+        dx = (mouse_x - plant.x)
+        dy = (mouse_y - plant.y)
+        distance = math.sqrt(dx**2 + dy**2)
+        angle = angles[i]
+
+        if distance <= radius:
+            new_angle = angle + speed
+            new_distance = distance - attraction_speed
+            new_x = mouse_x + math.cos(new_angle) * new_distance
+            new_y = mouse_y + math.sin(new_angle) * new_distance
+            plant.x, plant.y= new_x, new_y
+            angles[i] = new_angle
+
 class Plant:
     def __init__(self, x, y, energy):
         self.x = x
@@ -106,10 +125,10 @@ class Plant:
 
     def draw(self, screen):
         radius = max(2, min(4, int(self.energy / 20)))
-        pygame.gfxdraw.filled_circle(screen, self.x, self.y, radius, PLANT_COLOR)
-        pygame.gfxdraw.aacircle(screen, self.x, self.y, radius, PLANT_COLOR)
-        pygame.gfxdraw.aacircle(screen, self.x, self.y, radius - 2 , PLANT_COLOR2)
-        pygame.gfxdraw.filled_circle(screen, self.x, self.y, radius - 2, PLANT_COLOR2)
+        pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), radius, PLANT_COLOR)
+        pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), radius, PLANT_COLOR)
+        pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), radius - 2 , PLANT_COLOR2)
+        pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), radius - 2, PLANT_COLOR2)
 
     def generate_new_plant(plant):
         new_x = plant.x + random.randint(-200, 200)
@@ -307,6 +326,7 @@ predators = [Predator(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_H
 running = True
 dragging1 = False
 dragging2 = False
+mouse_down = False
 while running:
     for event in pygame.event.get():
 
@@ -332,6 +352,7 @@ while running:
                 if area_x <= image1_x <= area_x + area_w - image1.get_width() and area_y <= image1_y <= area_y + area_h - image1.get_height():
                     image1_x, image1_y = start_x1, start_y1
                     image1 = pygame.image.load("tornado.png")
+                    print("Tornado")
                 else:
                     image1_x, image1_y = start_x1, start_y1
                 dragging1 = False
@@ -410,6 +431,8 @@ while running:
                     initial_predators += event.unicode
                 if active4:
                     temperature += event.unicode
+
+    tornado(plants, image1_x, image1_y, radius, speed, attraction_speed)
 
     screen.fill(BACKGROUND_COLOR)
     screen.blit(image1, (image1_x, image1_y))
