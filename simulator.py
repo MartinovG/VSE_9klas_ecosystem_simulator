@@ -35,12 +35,13 @@ initial_plants = '250'
 initial_herbivores = '50'
 initial_predators = '10'
 temperature = '0'
+plants_count = int(initial_plants)
+herbivores_count = int(initial_herbivores)
+predators_count = int(initial_predators)
 PLANT_REPRODUCTION_RATE = 0.01
 MATING_ENERGY_THRESHOLD = 15000  
 OFFSPRING_ENERGY_FACTOR = 0.2  
 MATING_DISTANCE = 2  
-#DARK_GREEN = (0, 100, 0)
-#BLUE = (0, 0, 255)  
 start_x1 = SCREEN_WIDTH - 500
 start_y1 = SCREEN_HEIGHT - 500 
 start_x2 = SCREEN_WIDTH - 500 
@@ -50,10 +51,10 @@ image2_x, image2_y = start_x2, start_y2
 area_x, area_y, area_w, area_h = 390, SCREEN_HEIGHT - 590, SCREEN_WIDTH - 390, 590
 pygame.font.init()
 font = pygame.font.Font(None, 36)
-text = font.render("Drop here", True, (0, 0, 0))
-radius = 200  
-speed = 0.012  
-attraction_speed = 0.05 
+text = font.render("Hold here", True, (0, 0, 0))
+radius = 100  
+speed = 0.05 
+attraction_speed = 0.5 
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
@@ -61,31 +62,9 @@ clock = pygame.time.Clock()
 image1 = pygame.image.load("tornado.png")
 image2 = pygame.image.load("fire.png")
 
-angles = [random.uniform(0, 2 * math.pi) for _ in range(int(initial_plants))]
-
-'''def generate_perlin_noise(width, height, scale):
-    noise_array = []
-    for y in range(height):
-        row = []
-        for x in range(width):
-            value = noise.pnoise2(x/scale, y/scale, octaves=6, persistence=0.5, lacunarity=2.0, repeatx=1024, repeaty=1024, base=0)
-            row.append(value)
-        noise_array.append(row)
-    return noise_array'''
-
-'''def draw_pond(noise_array, scale, threshold):
-    for y in range(len(noise_array)):
-        for x in range(len(noise_array[y])):
-            if noise_array[y][x] < threshold:
-                pond_x = x * scale + 390  # Adjust x-coordinate based on the starting boundary
-                pond_y = y * scale + (SCREEN_HEIGHT - 590)  # Adjust y-coordinate based on the starting and ending boundaries
-                if pond_y < 590:  # Check if the y-coordinate is within the ending boundary
-                    pygame.draw.rect(screen, DARK_GREEN, (pond_x, pond_y, scale, scale))
-            else:
-                pond_x = x * scale + 390  # Adjust x-coordinate based on the starting boundary
-                pond_y = y * scale + (SCREEN_HEIGHT - 590)  # Adjust y-coordinate based on the starting and ending boundaries
-                if pond_y < 590:  # Check if the y-coordinate is within the ending boundary
-                    pygame.draw.rect(screen, BLUE, (pond_x, pond_y, scale, scale))'''
+plant_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(plants_count))]
+herbivore_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(herbivores_count))]
+predator_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(predators_count))]
 
 def draw_button(screen, button_rect, text): #simulation control buttons
     pygame.draw.rect(screen, (100, 100, 100), button_rect, 0)
@@ -102,20 +81,62 @@ def draw_text_box(screen, base_font, text, color, input_rect): #animal number co
     screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
     input_rect.w = max(100, text_surface.get_width() + 10)
 
-def tornado(plants, mouse_x, mouse_y, radius, speed, attraction_speed):
+def tornado_plants(plants, mouse_x, mouse_y, radius, speed, attraction_speed):
     for i, plant in enumerate(plants):
         dx = (mouse_x - plant.x)
         dy = (mouse_y - plant.y)
         distance = math.sqrt(dx**2 + dy**2)
-        angle = angles[i]
+        angle = plant_angles[i]
 
         if distance <= radius:
             new_angle = angle + speed
             new_distance = distance - attraction_speed
             new_x = mouse_x + math.cos(new_angle) * new_distance
             new_y = mouse_y + math.sin(new_angle) * new_distance
-            plant.x, plant.y= new_x, new_y
-            angles[i] = new_angle
+
+            new_x = max(390, min(new_x, SCREEN_WIDTH))
+            new_y = max(SCREEN_HEIGHT - 590, min(new_y, 590))
+
+            plant.x, plant.y = new_x, new_y
+            plant_angles[i] = new_angle
+
+def tornado_herbivores(herbivores, mouse_x, mouse_y, radius, speed, attraction_speed):
+    for i, herbivore in enumerate(herbivores):
+        dx = (mouse_x - herbivore.x)
+        dy = (mouse_y - herbivore.y)
+        distance = math.sqrt(dx**2 + dy**2)
+        angle = herbivore_angles[i]
+
+        if distance <= radius:
+            new_angle = angle + speed
+            new_distance = distance - attraction_speed
+            new_x = mouse_x + math.cos(new_angle) * new_distance
+            new_y = mouse_y + math.sin(new_angle) * new_distance
+
+            new_x = max(390, min(new_x, SCREEN_WIDTH))
+            new_y = max(SCREEN_HEIGHT - 590, min(new_y, 590))
+
+            herbivore.x, herbivore.y = new_x, new_y
+            herbivore_angles[i] = new_angle
+
+def tornado_predators(predators, mouse_x, mouse_y, radius, speed, attraction_speed):
+    for i, predator in enumerate(predators):
+        dx = (mouse_x - predator.x)
+        dy = (mouse_y - predator.y)
+        distance = math.sqrt(dx**2 + dy**2)
+        angle = predator_angles[i]
+
+        if distance <= radius:
+            new_angle = angle + speed
+            new_distance = distance - attraction_speed
+            new_x = mouse_x + math.cos(new_angle) * new_distance
+            new_y = mouse_y + math.sin(new_angle) * new_distance
+
+            new_x = max(390, min(new_x, SCREEN_WIDTH))
+            new_y = max(SCREEN_HEIGHT - 590, min(new_y, 590))
+
+            predator.x, predator.y = new_x, new_y
+            predator_angles[i] = new_angle
 
 class Plant:
     def __init__(self, x, y, energy):
@@ -334,6 +355,10 @@ while running:
             running = False
             sys.exit()
 
+        plant_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(plants_count))]
+        herbivore_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(herbivores_count))]
+        predator_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(predators_count))]
+
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
 
@@ -432,13 +457,14 @@ while running:
                 if active4:
                     temperature += event.unicode
 
-    tornado(plants, image1_x, image1_y, radius, speed, attraction_speed)
+    if 390 <= image1_x <= SCREEN_WIDTH and SCREEN_HEIGHT - 590 <= image1_y <= SCREEN_HEIGHT - 10:
+        tornado_plants(plants, image1_x, image1_y, radius, speed, attraction_speed)
+        tornado_herbivores(herbivores, image1_x, image1_y, radius, speed, attraction_speed)
+        tornado_predators(predators, image1_x, image1_y, radius, speed, attraction_speed)
 
     screen.fill(BACKGROUND_COLOR)
     screen.blit(image1, (image1_x, image1_y))
     screen.blit(image2, (image2_x, image2_y))
-    #noise_array = generate_perlin_noise(SCREEN_WIDTH // 7, SCREEN_HEIGHT // 5, scale=15)
-    #draw_pond(noise_array, scale=5, threshold=0.15)   
     draw_button(screen, button_rect, button_text)
     draw_button(screen, button_rect2, button_text2)
     pygame.gfxdraw.rectangle(screen, pygame.Rect(389, SCREEN_HEIGHT - 591, SCREEN_WIDTH, 583), BORDER_COLOR) #simulation border
@@ -464,6 +490,7 @@ while running:
                 new_plant = plant.generate_new_plant()
                 if new_plant is not None:
                     plants.append(new_plant)
+                    plants_count += 1
                     
         for herbivore in herbivores:
             herbivore.move_towards_food(plants)
@@ -473,13 +500,16 @@ while running:
             for plant in plants:
                 if herbivore.eat(plant):
                     plants.remove(plant)
+                    plants_count -= 1
 
             new_herbivore = herbivore.reproduce()
             if new_herbivore is not None:
                 herbivores.append(new_herbivore)
+                herbivores_count += 1
 
             if herbivore.energy <= 50:
                 herbivores.remove(herbivore)
+                herbivores_count -= 1
 
         for predator in predators:
             predator.move_towards_food(herbivores)
@@ -489,13 +519,16 @@ while running:
             for herbivore in herbivores:
                 if predator.eat(herbivore):
                     herbivores.remove(herbivore)
+                    herbivores_count -= 1
 
             new_predator = predator.reproduce()
             if new_predator is not None:
                 predators.append(new_predator)
+                predators_count += 1
 
             if predator.energy <= 50:
                 predators.remove(predator)
+                predators_count -= 1
 
         new_herbivores = []
         new_predators = []
@@ -506,6 +539,7 @@ while running:
                     offspring = h1.mate(h2)
                     if offspring:
                         new_herbivores.append(offspring)
+                        herbivores_count += 1
 
         for p1 in predators:
             for p2 in predators:
@@ -513,6 +547,7 @@ while running:
                     offspring = p1.mate(p2)
                     if offspring:
                         new_predators.append(offspring)
+                        predators_count += 1
 
     if not simulation_started:
         if button_text2 == "Begin":
@@ -524,6 +559,7 @@ while running:
 
             for predator in predators:
                 predator.draw(screen)
+
     elif button_text2 == "Finish":
         plants = [Plant(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PLANT_ENERGY) for _ in range(int(initial_plants))]
         herbivores = [Herbivore(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), HERBIVORE_ENERGY) for _ in range(int(initial_herbivores))]
@@ -559,6 +595,13 @@ while running:
     if (dragging1 and area_x <= image1_x <= area_x + area_w - image1.get_width() and area_y <= image1_y <= area_y + area_h - image1.get_height()) or \
        (dragging2 and area_x <= image2_x <= area_x + area_w - image2.get_width() and area_y <= image2_y <= area_y + area_h - image2.get_height()):
         screen.blit(text, (area_x + (area_w - text.get_width()) // 2, area_y + (area_h - text.get_height()) // 2))
+
+    plants_alive = font.render(str(plants_count), True, PLANT_COLOR)
+    screen.blit(plants_alive, (350, 300))
+    herbivores_alive = font.render(str(herbivores_count), True, HERBIVORE_COLOR)
+    screen.blit(herbivores_alive, (350, 400))
+    predators_alive = font.render(str(predators_count), True, PREDATOR_COLOR)
+    screen.blit(predators_alive, (350, 500))
 
     pygame.display.flip()
     clock.tick(FPS)
