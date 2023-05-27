@@ -1,5 +1,4 @@
 import pygame
-import pygame.gfxdraw
 import random
 import math
 import sys
@@ -9,6 +8,11 @@ from Herbivores import *
 from Predators import *
 
 pygame.init()
+
+base_font = pygame.font.Font(None, 32)
+pygame.font.init()
+font = pygame.font.Font(None, 36)
+text = font.render("Hold here", True, (0, 0, 0))
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
@@ -102,13 +106,6 @@ while running:
         if event.type == pygame.QUIT:
             running = False
             sys.exit()
-
-        plants_count = int(initial_plants)
-        herbivores_count = int(initial_herbivores)
-        predators_count = int(initial_predators)
-        plant_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(plants_count + 1000))]
-        herbivore_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(herbivores_count + 1000))]
-        predator_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(predators_count + 1000))]
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
@@ -207,11 +204,10 @@ while running:
                     initial_predators += event.unicode
                 if active4:
                     temperature += event.unicode
-
-    if 390 <= image1_x <= SCREEN_WIDTH and SCREEN_HEIGHT - 590 <= image1_y <= SCREEN_HEIGHT - 10:
-        tornado_plants(plants, image1_x, image1_y, radius, speed, attraction_speed)
-        tornado_herbivores(herbivores, image1_x, image1_y, radius, speed, attraction_speed)
-        tornado_predators(predators, image1_x, image1_y, radius, speed, attraction_speed)
+            
+            plants_count = int(initial_plants)
+            herbivores_count = int(initial_herbivores)
+            predators_count = int(initial_predators)
 
     screen.fill(BACKGROUND_COLOR)
     screen.blit(image1, (image1_x, image1_y))
@@ -219,6 +215,17 @@ while running:
     draw_button(screen, button_rect, button_text)
     draw_button(screen, button_rect2, button_text2)
     pygame.gfxdraw.rectangle(screen, pygame.Rect(389, SCREEN_HEIGHT - 591, SCREEN_WIDTH, 583), BORDER_COLOR) #simulation border
+
+    if not simulation_started:
+        if button_text2 == "Begin":
+            for plant in plants:
+                plant.draw(screen)
+
+            for herbivore in herbivores:
+                herbivore.draw(screen)
+                
+            for predator in predators:
+                predator.draw(screen)
 
     if not simulation_running:
 
@@ -299,17 +306,15 @@ while running:
                     if offspring:
                         new_predators.append(offspring)
                         predators_count += 1
+        
+        plant_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(plants_count + 1000))]
+        herbivore_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(herbivores_count + 1000))]
+        predator_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(predators_count + 1000))]
 
-    if not simulation_started:
-        if button_text2 == "Begin":
-            for plant in plants:
-                plant.draw(screen)
-
-            for herbivore in herbivores:
-                herbivore.draw(screen)
-
-            for predator in predators:
-                predator.draw(screen)
+        if 390 <= image1_x <= SCREEN_WIDTH and SCREEN_HEIGHT - 590 <= image1_y <= SCREEN_HEIGHT - 10:
+            tornado_plants(plants, image1_x, image1_y, radius, speed, attraction_speed)
+            tornado_herbivores(herbivores, image1_x, image1_y, radius, speed, attraction_speed)
+            tornado_predators(predators, image1_x, image1_y, radius, speed, attraction_speed)
 
     elif button_text2 == "Finish":
         plants = [Plant(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PLANT_ENERGY) for _ in range(int(initial_plants))]

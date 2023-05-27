@@ -1,5 +1,6 @@
 import pygame
 
+
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 FPS = 60
@@ -23,7 +24,6 @@ HERBIVORE_ENERGY_COST = 0.005
 PREDATOR_ENERGY_COST = 0.007 
 ENERGY_DEPLETION_FACTOR = 1
 REPRODUCTION_ENERGY_COST = 200
-base_font = pygame.font.Font(None, 32)
 initial_plants = '0'
 initial_herbivores = '0'
 initial_predators = '0'
@@ -39,9 +39,6 @@ start_y2 = SCREEN_HEIGHT - 400
 image1_x, image1_y = start_x1, start_y1
 image2_x, image2_y = start_x2, start_y2
 area_x, area_y, area_w, area_h = 390, SCREEN_HEIGHT - 590, SCREEN_WIDTH - 390, 590
-pygame.font.init()
-font = pygame.font.Font(None, 36)
-text = font.render("Hold here", True, (0, 0, 0))
 radius = 100  
 speed = 0.05 
 attraction_speed = 0.5 
@@ -79,3 +76,7 @@ color_active4 = pygame.Color(192, 192, 192)
 color_passive4 = pygame.Color(105,105,105)
 color4 = color_passive4
 active4 = False
+ 
+plants_count = 0
+herbivores_count = 0
+predators_count = 0
