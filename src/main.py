@@ -205,10 +205,6 @@ while running:
                 if active4:
                     temperature += event.unicode
             
-            plants_count = int(initial_plants)
-            herbivores_count = int(initial_herbivores)
-            predators_count = int(initial_predators)
-
     screen.fill(BACKGROUND_COLOR)
     screen.blit(image1, (image1_x, image1_y))
     screen.blit(image2, (image2_x, image2_y))
@@ -226,7 +222,7 @@ while running:
                 
             for predator in predators:
                 predator.draw(screen)
-
+            
     if not simulation_running:
 
         if -20 <= int(temperature) <= 20:
@@ -322,6 +318,9 @@ while running:
         predators = [Predator(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PREDATOR_ENERGY) for _ in range(int(initial_predators))]
         simulation_started = False
         button_text2 = "Begin"
+        plants_count = int(initial_plants)
+        herbivores_count = int(initial_herbivores)
+        predators_count = int(initial_predators)
 
     if active:
         color = color_active
