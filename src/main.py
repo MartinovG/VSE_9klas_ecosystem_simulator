@@ -162,7 +162,12 @@ while running:
                 active4 = True
             else:
                 active4 = False
-
+            
+        if event.type == pygame.MOUSEBUTTONDOWN: #humidity
+            if input_rect5.collidepoint(event.pos):
+                active5 = True
+            else:
+                active5 = False
 
         if event.type == pygame.KEYDOWN:
 
@@ -175,6 +180,8 @@ while running:
                     initial_predators = initial_predators[:-1]
                 if active4:
                     temperature = temperature[:-1]
+                if active5:
+                    humidity = humidity[:-1]
             else:
                 if active:
                     initial_plants += event.unicode
@@ -184,23 +191,14 @@ while running:
                     initial_predators += event.unicode
                 if active4:
                     temperature += event.unicode
+                if active5:
+                    humidity += event.unicode
             
     screen.fill(BACKGROUND_COLOR)
     screen.blit(image1, (image1_x, image1_y))
     draw_button(screen, button_rect, button_text)
     draw_button(screen, button_rect2, button_text2)
     pygame.gfxdraw.rectangle(screen, pygame.Rect(389, SCREEN_HEIGHT - 591, SCREEN_WIDTH, 583), BORDER_COLOR) #simulation border
-
-    if not simulation_started:
-        if button_text2 == "Begin":
-            for plant in plants:
-                plant.draw(screen)
-
-            for herbivore in herbivores:
-                herbivore.draw(screen)
-                
-            for predator in predators:
-                predator.draw(screen)
             
     if not simulation_running:
 
@@ -216,6 +214,12 @@ while running:
             HERBIVORE_SPEED = 0.1
             PREDATOR_SPEED = 0.1
 
+        if int(humidity) > 100 or int(humidity) < 0:
+            print("Invalid humidity value")
+        if 90 <= int(humidity) <= 100:
+            PLANT_COLOR = (89,96,24)
+            PLANT_COLOR2 = (0, 0, 0)
+
         for plant in plants:
             plant.grow()
         
@@ -226,14 +230,16 @@ while running:
                     plants_count += 1
                     
         for herbivore in herbivores:
-            herbivore.move_towards_food(plants)
-            herbivore.move()
+            if not 90 <= int(humidity) <= 100:
+                herbivore.move_towards_food(plants)
+            herbivore.move(HERBIVORE_SPEED, ENERGY_DEPLETION_FACTOR)
             herbivore.energy -= HERBIVORE_ENERGY_COST
 
             for plant in plants:
-                if herbivore.eat(plant):
-                    plants.remove(plant)
-                    plants_count -= 1
+                if not 90 <= int(humidity) <= 100:
+                    if herbivore.eat(plant):
+                        plants.remove(plant)
+                        plants_count -= 1
 
             new_herbivore = herbivore.reproduce()
             if new_herbivore is not None:
@@ -245,14 +251,16 @@ while running:
                 herbivores_count -= 1
 
         for predator in predators:
-            predator.move_towards_food(herbivores)
-            predator.move()
+            if not 90 <= int(humidity) <= 100:
+                predator.move_towards_food(herbivores)
+            predator.move(PREDATOR_SPEED, ENERGY_DEPLETION_FACTOR)
             predator.energy -= PREDATOR_ENERGY_COST
 
             for herbivore in herbivores:
-                if predator.eat(herbivore):
-                    herbivores.remove(herbivore)
-                    herbivores_count -= 1
+                if not 90 <= int(humidity) <= 100:
+                    if predator.eat(herbivore):
+                        herbivores.remove(herbivore)
+                        herbivores_count -= 1
 
             new_predator = predator.reproduce()
             if new_predator is not None:
@@ -291,7 +299,7 @@ while running:
             tornado_herbivores(herbivores, image1_x, image1_y, radius, speed, attraction_speed)
             tornado_predators(predators, image1_x, image1_y, radius, speed, attraction_speed)
 
-    elif button_text2 == "Finish":
+    if button_text2 == "Finish":
         plants = [Plant(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PLANT_ENERGY) for _ in range(int(initial_plants))]
         herbivores = [Herbivore(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), HERBIVORE_ENERGY) for _ in range(int(initial_herbivores))]
         predators = [Predator(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PREDATOR_ENERGY) for _ in range(int(initial_predators))]
@@ -300,6 +308,17 @@ while running:
         plants_count = int(initial_plants)
         herbivores_count = int(initial_herbivores)
         predators_count = int(initial_predators)
+    
+    if not simulation_started:
+        if button_text2 == "Begin":
+            for plant in plants:
+                plant.draw(screen, PLANT_COLOR, PLANT_COLOR2)
+
+            for herbivore in herbivores:
+                herbivore.draw(screen)
+                
+            for predator in predators:
+                predator.draw(screen)
 
     if active:
         color = color_active
@@ -320,11 +339,17 @@ while running:
         color4 = color_active4
     else:
         color4 = color_passive4
+        
+    if active5:
+        color5 = color_active5
+    else:
+        color5 = color_passive5
 
     draw_text_box(screen, base_font, initial_plants, color, input_rect) #plants
     draw_text_box(screen, base_font, initial_herbivores, color2, input_rect2) #herbivores
     draw_text_box(screen, base_font, initial_predators, color3, input_rect3) #predators
     draw_text_box(screen, base_font, temperature, color4, input_rect4) #temperature
+    draw_text_box(screen, base_font, humidity, color5, input_rect5) #humidity
 
     if (dragging1 and area_x <= image1_x <= area_x + area_w - image1.get_width() and area_y <= image1_y <= area_y + area_h - image1.get_height()):
         screen.blit(text, (area_x + (area_w - text.get_width()) // 2, area_y + (area_h - text.get_height()) // 2))

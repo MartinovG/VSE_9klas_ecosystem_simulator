@@ -26,7 +26,7 @@ class Herbivore:
 
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), size)
 
-    def move(self):
+    def move(self, HERBIVORE_SPEED, ENERGY_DEPLETION_FACTOR):
         dx = HERBIVORE_SPEED * math.cos(self.angle)
         dy = HERBIVORE_SPEED * math.sin(self.angle)
         new_x = self.x + dx

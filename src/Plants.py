@@ -9,7 +9,7 @@ class Plant:
         self.y = y
         self.energy = energy
 
-    def draw(self, screen):
+    def draw(self, screen, PLANT_COLOR, PLANT_COLOR2):
         radius = max(2, min(4, int(self.energy / 20)))
         pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), radius, PLANT_COLOR)
         pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), radius, PLANT_COLOR)

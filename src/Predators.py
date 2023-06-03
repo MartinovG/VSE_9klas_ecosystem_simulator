@@ -31,7 +31,7 @@ class Predator:
 
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), size)
 
-    def move(self):
+    def move(self, PREDATOR_SPEED, ENERGY_DEPLETION_FACTOR):
         dx = PREDATOR_SPEED * math.cos(self.angle)
         dy = PREDATOR_SPEED * math.sin(self.angle)
         new_x = self.x + dx

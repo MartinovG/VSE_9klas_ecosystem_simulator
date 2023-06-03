@@ -24,10 +24,11 @@ HERBIVORE_ENERGY_COST = 0.005
 PREDATOR_ENERGY_COST = 0.007 
 ENERGY_DEPLETION_FACTOR = 1
 REPRODUCTION_ENERGY_COST = 200
-initial_plants = '0'
-initial_herbivores = '0'
-initial_predators = '0'
+initial_plants = '50'
+initial_herbivores = '10'
+initial_predators = '3'
 temperature = '0'
+humidity = '90'
 PLANT_REPRODUCTION_RATE = 0.01
 MATING_ENERGY_THRESHOLD = 15000  
 OFFSPRING_ENERGY_FACTOR = 0.2  
@@ -48,7 +49,7 @@ button_text = "Start"
 button_x2, button_y2 = 10, 10
 button_rect2 = pygame.Rect(button_x2, button_y2, button_width, button_height)
 simulation_started = True
-button_text2 = "Finish"
+button_text2 = "Begin"
 
 input_rect = pygame.Rect(10, 200, 140, 32) #plants
 color_active = pygame.Color(144, 238, 144)
@@ -73,6 +74,12 @@ color_active4 = pygame.Color(192, 192, 192)
 color_passive4 = pygame.Color(105,105,105)
 color4 = color_passive4
 active4 = False
+
+input_rect5 = pygame.Rect(10, 400, 140, 32) #humidity
+color_active5 = pygame.Color(196, 164, 132)
+color_passive5 = pygame.Color(205, 127, 50)
+color5 = color_passive5
+active5 = False
  
 plants_count = 0
 herbivores_count = 0
