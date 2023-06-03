@@ -18,7 +18,6 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D Ecosystem Simulator")
 clock = pygame.time.Clock()
 image1 = pygame.image.load("tornado.png")
-image2 = pygame.image.load("fire.png")
 
 def draw_button(screen, button_rect, text): #simulation control buttons
     pygame.draw.rect(screen, (100, 100, 100), button_rect, 0)
@@ -98,7 +97,6 @@ predators = [Predator(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_H
 
 running = True
 dragging1 = False
-dragging2 = False
 mouse_down = False
 while running:
     for event in pygame.event.get():
@@ -115,11 +113,6 @@ while running:
                 mouse_offset_x1 = mouse_x - image1_x
                 mouse_offset_y1 = mouse_y - image1_y
 
-            if image2_x <= mouse_x <= image2_x + image2.get_width() and image2_y <= mouse_y <= image2_y + image2.get_height():
-                dragging2 = True
-                mouse_offset_x2 = mouse_x - image2_x
-                mouse_offset_y2 = mouse_y - image2_y
-
         elif event.type == pygame.MOUSEBUTTONUP:
             if dragging1:
                 if area_x <= image1_x <= area_x + area_w - image1.get_width() and area_y <= image1_y <= area_y + area_h - image1.get_height():
@@ -130,24 +123,11 @@ while running:
                     image1_x, image1_y = start_x1, start_y1
                 dragging1 = False
 
-            if dragging2:
-                if area_x <= image2_x <= area_x + area_w - image2.get_width() and area_y <= image2_y <= area_y + area_h - image2.get_height():
-                    image2_x, image2_y = start_x2, start_y2
-                    image2 = pygame.image.load("fire.png")
-                else:
-                    image2_x, image2_y = start_x2, start_y2
-                dragging2 = False
-
         elif event.type == pygame.MOUSEMOTION:
             if dragging1:
                 mouse_x, mouse_y = event.pos
                 image1_x = mouse_x - mouse_offset_x1
                 image1_y = mouse_y - mouse_offset_y1
-
-            if dragging2:
-                mouse_x, mouse_y = event.pos
-                image2_x = mouse_x - mouse_offset_x2
-                image2_y = mouse_y - mouse_offset_y2
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if button_rect.collidepoint(event.pos):
@@ -207,7 +187,6 @@ while running:
             
     screen.fill(BACKGROUND_COLOR)
     screen.blit(image1, (image1_x, image1_y))
-    screen.blit(image2, (image2_x, image2_y))
     draw_button(screen, button_rect, button_text)
     draw_button(screen, button_rect2, button_text2)
     pygame.gfxdraw.rectangle(screen, pygame.Rect(389, SCREEN_HEIGHT - 591, SCREEN_WIDTH, 583), BORDER_COLOR) #simulation border
@@ -347,8 +326,7 @@ while running:
     draw_text_box(screen, base_font, initial_predators, color3, input_rect3) #predators
     draw_text_box(screen, base_font, temperature, color4, input_rect4) #temperature
 
-    if (dragging1 and area_x <= image1_x <= area_x + area_w - image1.get_width() and area_y <= image1_y <= area_y + area_h - image1.get_height()) or \
-       (dragging2 and area_x <= image2_x <= area_x + area_w - image2.get_width() and area_y <= image2_y <= area_y + area_h - image2.get_height()):
+    if (dragging1 and area_x <= image1_x <= area_x + area_w - image1.get_width() and area_y <= image1_y <= area_y + area_h - image1.get_height()):
         screen.blit(text, (area_x + (area_w - text.get_width()) // 2, area_y + (area_h - text.get_height()) // 2))
 
     plants_alive = font.render(str(plants_count), True, PLANT_COLOR)
