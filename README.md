@@ -14,7 +14,7 @@ The Ecosystem Simulator is a Python program that simulates the dynamics of a vir
 ## Installation
 
 1. Clone the repository to your local machine: 
-git clone https://github.com/MartinovG/VSE_9klas_ecosystem_simulator.git
+'''git clone https://github.com/MartinovG/VSE_9klas_ecosystem_simulator.git'''
 
 
 
