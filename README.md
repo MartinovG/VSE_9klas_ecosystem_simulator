@@ -37,7 +37,9 @@ py main.py
 
 3. Press the "Begin" button to start the simulation and observe the ecosystem dynamics in real-time.
 
+## License
 
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
 
 
