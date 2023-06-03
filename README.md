@@ -17,6 +17,27 @@ The Ecosystem Simulator is a Python program that simulates the dynamics of a vir
 ```
 git clone https://github.com/MartinovG/VSE_9klas_ecosystem_simulator.git
 ```
+2. Install Python
+3. Install the required dependencies
+```
+pip install pygame
+```
+```
+pip install random
+```
+
+## Usage
+
+1. Run the `main.py` file:
+```
+py main.py
+```
+
+2. Use the mouse to interact with the simulation. You can modify environmental factors.
+
+3. Press the "Begin" button to start the simulation and observe the ecosystem dynamics in real-time.
+
+
 
 
 
