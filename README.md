@@ -25,6 +25,9 @@ pip install pygame
 ```
 pip install random
 ```
+```
+pip install matplotlib
+```
 
 ## Usage
 
@@ -36,6 +39,8 @@ py main.py
 2. Use the mouse to interact with the simulation. You can modify environmental factors.
 
 3. Press the "Begin" button to start the simulation and observe the ecosystem dynamics in real-time.
+
+4.You can see graph about living plants, herbivores and predators as a result of the simulation by clicking the button "Graph"
 
 ## License
 
