@@ -6,6 +6,7 @@ from variables import *
 from Plants import *
 from Herbivores import *
 from Predators import *
+from graphs import *
 
 pygame.init()
 
@@ -98,6 +99,7 @@ predators = [Predator(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_H
 running = True
 dragging1 = False
 mouse_down = False
+
 while running:
     for event in pygame.event.get():
 
@@ -138,6 +140,11 @@ while running:
             if button_rect2.collidepoint(event.pos):
                 simulation_started = not simulation_started
                 button_text2 = "Finish" if button_text2 == "Begin" else "Begin"
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if button_rect3.collidepoint(event.pos):
+                plot_results(herbivores_counts, predators_counts, plants_counts)
+                pygame.quit()
 
         if event.type == pygame.MOUSEBUTTONDOWN: #plants
             if input_rect.collidepoint(event.pos):
@@ -198,6 +205,7 @@ while running:
     screen.blit(image1, (image1_x, image1_y))
     draw_button(screen, button_rect, button_text)
     draw_button(screen, button_rect2, button_text2)
+    draw_button(screen, button_rect3, button_text3)
     pygame.gfxdraw.rectangle(screen, pygame.Rect(389, SCREEN_HEIGHT - 591, SCREEN_WIDTH, 583), BORDER_COLOR) #simulation border
             
     if not simulation_running:
@@ -219,6 +227,9 @@ while running:
         if 90 <= int(humidity) <= 100:
             PLANT_COLOR = (89,96,24)
             PLANT_COLOR2 = (0, 0, 0)
+        else:
+            PLANT_COLOR = (0, 255, 0)
+            PLANT_COLOR2 = (128, 0, 128)
 
         for plant in plants:
             plant.grow()
@@ -361,7 +372,13 @@ while running:
     predators_alive = font.render(str(predators_count), True, PREDATOR_COLOR)
     screen.blit(predators_alive, (350, 500))
 
+    herbivores_counts.append(herbivores_count)
+    predators_counts.append(predators_count)
+    plants_counts.append(plants_count)
+    print(herbivores_counts)
+
     pygame.display.flip()
     clock.tick(FPS)
-
+    
 pygame.quit()
+
