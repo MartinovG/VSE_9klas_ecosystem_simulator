@@ -17,6 +17,10 @@ def plot_results(herbivores_counts, predators_counts, plants_counts):
 
     plt.show()
 
+    print(herbivores_counts)
+    print(predators_counts)
+    print(plants_counts)
+
 def draw_button(screen, button_rect, text): #simulation control buttons
     pygame.draw.rect(screen, (100, 100, 100), button_rect, 0)
     pygame.draw.rect(screen, (200, 200, 200), button_rect, 1)

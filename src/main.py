@@ -21,10 +21,6 @@ pygame.display.set_caption("2D Ecosystem Simulator")
 clock = pygame.time.Clock()
 image1 = pygame.image.load("tornado.png")
 
-plants = [Plant(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PLANT_ENERGY) for _ in range(int(initial_plants))]
-herbivores = [Herbivore(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), HERBIVORE_ENERGY) for _ in range(int(initial_herbivores))]
-predators = [Predator(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PREDATOR_ENERGY) for _ in range(int(initial_predators))]
-
 running = True
 dragging1 = False
 mouse_down = False
@@ -238,6 +234,10 @@ while running:
             tornado_plants(plants, image1_x, image1_y, radius, speed, attraction_speed, plant_angles)
             tornado_herbivores(herbivores, image1_x, image1_y, radius, speed, attraction_speed, herbivore_angles)
             tornado_predators(predators, image1_x, image1_y, radius, speed, attraction_speed, predator_angles)
+        
+        herbivores_counts.append(herbivores_count)
+        predators_counts.append(predators_count)
+        plants_counts.append(plants_count)
 
     if button_text2 == "Finish":
         plants = [Plant(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PLANT_ENERGY) for _ in range(int(initial_plants))]
@@ -294,16 +294,23 @@ while running:
     if (dragging1 and area_x <= image1_x <= area_x + area_w - image1.get_width() and area_y <= image1_y <= area_y + area_h - image1.get_height()):
         screen.blit(text, (area_x + (area_w - text.get_width()) // 2, area_y + (area_h - text.get_height()) // 2))
 
-    plants_alive = font.render(str(plants_count), True, PLANT_COLOR)
-    screen.blit(plants_alive, (350, 300))
-    herbivores_alive = font.render(str(herbivores_count), True, HERBIVORE_COLOR)
-    screen.blit(herbivores_alive, (350, 400))
-    predators_alive = font.render(str(predators_count), True, PREDATOR_COLOR)
-    screen.blit(predators_alive, (350, 500))
+    inscription = font.render("Plants:", True, color_passive)
+    screen.blit(inscription, (10, 120))
+    inscription = font.render("Herbivores:", True, color_passive2)
+    screen.blit(inscription, (10, 190))
+    inscription = font.render("Predators:", True, color_passive3)
+    screen.blit(inscription, (10, 260))
+    inscription = font.render("Temperature:", True, color_passive4)
+    screen.blit(inscription, (10, 330))
+    inscription = font.render("Humidity:", True, color_passive5)
+    screen.blit(inscription, (10, 400))
 
-    herbivores_counts.append(herbivores_count)
-    predators_counts.append(predators_count)
-    plants_counts.append(plants_count)
+    plants_alive = font.render(str(plants_count), True, PLANT_COLOR)
+    screen.blit(plants_alive, (350, 150))
+    herbivores_alive = font.render(str(herbivores_count), True, HERBIVORE_COLOR)
+    screen.blit(herbivores_alive, (350, 220))
+    predators_alive = font.render(str(predators_count), True, PREDATOR_COLOR)
+    screen.blit(predators_alive, (350, 290))
 
     pygame.display.flip()
     clock.tick(FPS)
