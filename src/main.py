@@ -57,14 +57,16 @@ while running:
                 image1_y = mouse_y - mouse_offset_y1
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if button_rect.collidepoint(event.pos):
-                simulation_running = not simulation_running
-                button_text = "Start" if button_text == "Pause" else "Pause"
+            if draw == 1:
+                if button_rect.collidepoint(event.pos):
+                    simulation_running = not simulation_running
+                    button_text = "Start" if button_text == "Pause" else "Pause"
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if button_rect2.collidepoint(event.pos):
                 simulation_started = not simulation_started
-                button_text2 = "Finish" if button_text2 == "Begin" else "Begin"
+                button_text2 = "Drew" if button_text2 == "Draw" else "Draw"
+                draw = 1
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if button_rect3.collidepoint(event.pos):
@@ -239,18 +241,18 @@ while running:
         predators_counts.append(predators_count)
         plants_counts.append(plants_count)
 
-    if button_text2 == "Finish":
+    if button_text2 == "Drew":
         plants = [Plant(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PLANT_ENERGY) for _ in range(int(initial_plants))]
         herbivores = [Herbivore(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), HERBIVORE_ENERGY) for _ in range(int(initial_herbivores))]
         predators = [Predator(random.randint(390, SCREEN_WIDTH), random.randint(SCREEN_HEIGHT - 590, 590), PREDATOR_ENERGY) for _ in range(int(initial_predators))]
         simulation_started = False
-        button_text2 = "Begin"
+        button_text2 = "Draw"
         plants_count = int(initial_plants)
         herbivores_count = int(initial_herbivores)
         predators_count = int(initial_predators)
-    
+
     if not simulation_started:
-        if button_text2 == "Begin":
+        if button_text2 == "Draw":
             for plant in plants:
                 plant.draw(screen, PLANT_COLOR, PLANT_COLOR2)
 

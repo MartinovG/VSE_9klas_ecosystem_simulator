@@ -48,7 +48,7 @@ button_text = "Start"
 button_x2, button_y2 = 10, 10
 button_rect2 = pygame.Rect(button_x2, button_y2, button_width, button_height)
 simulation_started = True
-button_text2 = "Begin"
+button_text2 = "Draw"
 button_x3, button_y3 = 210, 10
 button_rect3 = pygame.Rect(button_x3, button_y3, button_width, button_height)
 simulation_paused = True
@@ -91,3 +91,5 @@ predators_count = 0
 herbivores_counts = []
 predators_counts = []
 plants_counts = []
+
+draw = 0
