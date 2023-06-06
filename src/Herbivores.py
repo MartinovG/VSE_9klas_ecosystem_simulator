@@ -70,11 +70,12 @@ class Herbivore:
             self.turn()
 
     def reproduce(self):
-        if self.energy >= HERBIVORE_FOOD_THRESHOLD + REPRODUCTION_ENERGY_COST:
-            self.energy -= REPRODUCTION_ENERGY_COST
-            return Herbivore(self.x, self.y, self.energy / 2)
-        else:
-            return None
+        if self.gender == "female":
+            if self.energy >= HERBIVORE_FOOD_THRESHOLD + REPRODUCTION_ENERGY_COST:
+                self.energy -= REPRODUCTION_ENERGY_COST
+                return Herbivore(self.x, self.y, self.energy / 2)
+            else:
+                return None
 
     def mate(self, other):
         if (self.gender != other.gender) and (self.energy > MATING_ENERGY_THRESHOLD) and (other.energy > MATING_ENERGY_THRESHOLD):

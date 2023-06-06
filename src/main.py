@@ -14,6 +14,7 @@ pygame.init()
 base_font = pygame.font.Font(None, 32)
 pygame.font.init()
 font = pygame.font.Font(None, 36)
+note_font = pygame.font.Font(None, 16)
 text = font.render("Hold here", True, (0, 0, 0))
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -313,6 +314,8 @@ while running:
     screen.blit(herbivores_alive, (350, 220))
     predators_alive = font.render(str(predators_count), True, PREDATOR_COLOR)
     screen.blit(predators_alive, (350, 290))
+    note = note_font.render("Note:Please, eneter only numbers in the text boxes.Thank you!.", True, (0, 0, 0))
+    screen.blit(note, (10, 470))
 
     pygame.display.flip()
     clock.tick(FPS)
