@@ -234,9 +234,12 @@ while running:
         predator_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(predators_count + 1000))]
 
         if 390 <= image1_x <= SCREEN_WIDTH and SCREEN_HEIGHT - 590 <= image1_y <= SCREEN_HEIGHT - 10:
-            tornado_plants(plants, image1_x, image1_y, radius, speed, attraction_speed, plant_angles)
+            tornado_plants(plants, image1_x, image1_y, radius, speed, attraction_speed, plant_angles,)
+            plants_count = len(plants)
             tornado_herbivores(herbivores, image1_x, image1_y, radius, speed, attraction_speed, herbivore_angles)
+            herbivores_count = len(herbivores)
             tornado_predators(predators, image1_x, image1_y, radius, speed, attraction_speed, predator_angles)
+            predators_count = len(predators)
         
         herbivores_counts.append(herbivores_count)
         predators_counts.append(predators_count)
@@ -321,4 +324,3 @@ while running:
     clock.tick(FPS)
     
 pygame.quit()
-

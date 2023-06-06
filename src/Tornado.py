@@ -1,6 +1,11 @@
 import math
 from variables import *
+import random
+from Plants import *
+from Herbivores import *
+from Predators import *
 
+death_probability = 0.1
 
 def tornado_plants(plants, mouse_x, mouse_y, radius, speed, attraction_speed, plant_angles):
     for i, plant in enumerate(plants):
@@ -10,6 +15,8 @@ def tornado_plants(plants, mouse_x, mouse_y, radius, speed, attraction_speed, pl
         angle = plant_angles[i]
 
         if distance <= radius:
+            if random.random() < death_probability:
+                plants.remove(plant)
             new_angle = angle + speed
             new_distance = distance - attraction_speed
             new_x = mouse_x + math.cos(new_angle) * new_distance
@@ -29,6 +36,8 @@ def tornado_herbivores(herbivores, mouse_x, mouse_y, radius, speed, attraction_s
         angle = herbivore_angles[i]
 
         if distance <= radius:
+            if random.random() < death_probability:
+                herbivores.remove(herbivore)
             new_angle = angle + speed
             new_distance = distance - attraction_speed
             new_x = mouse_x + math.cos(new_angle) * new_distance
@@ -48,6 +57,8 @@ def tornado_predators(predators, mouse_x, mouse_y, radius, speed, attraction_spe
         angle = predator_angles[i]
 
         if distance <= radius:
+            if random.random() < death_probability:
+                predators.remove(predator)
             new_angle = angle + speed
             new_distance = distance - attraction_speed
             new_x = mouse_x + math.cos(new_angle) * new_distance
