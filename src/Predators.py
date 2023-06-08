@@ -12,11 +12,6 @@ class Predator:
         self.gender = random.choice(["male", "female"])
         self.color = self.adjust_color_by_gender(color)
 
-    def distance_to(self, other):
-        dx = self.x - other.x
-        dy = self.y - other.y
-        return math.sqrt(dx**2 + dy**2)
-
     def adjust_color_by_gender(self, color):
         if self.gender == "male":
             return (128, 0, 0)  # Darker shade
@@ -84,13 +79,3 @@ class Predator:
             else:
                 return None
         
-    def mate(self, other):
-        if (self.gender != other.gender) and (self.energy > MATING_ENERGY_THRESHOLD) and (other.energy > MATING_ENERGY_THRESHOLD):
-            offspring_energy = self.energy * OFFSPRING_ENERGY_FACTOR + other.energy * OFFSPRING_ENERGY_FACTOR
-            offspring_color = tuple((c1 + c2) // 2 for c1, c2 in zip(self.color, other.color))
-            offspring = Predator(self.x, self.y, offspring_energy, color=offspring_color)
-            self.energy *= (1 - OFFSPRING_ENERGY_FACTOR)
-            other.energy *= (1 - OFFSPRING_ENERGY_FACTOR)
-            return offspring
-        return None    
-    

@@ -210,25 +210,6 @@ while running:
                 predators.remove(predator)
                 predators_count -= 1
 
-        new_herbivores = []
-        new_predators = []
-
-        for h1 in herbivores:
-            for h2 in herbivores:
-                if h1 != h2 and h1.distance_to(h2) < MATING_DISTANCE:
-                    offspring = h1.mate(h2)
-                    if offspring:
-                        new_herbivores.append(offspring)
-                        herbivores_count += 1
-
-        for p1 in predators:
-            for p2 in predators:
-                if p1 != p2 and p1.distance_to(p2) < MATING_DISTANCE:
-                    offspring = p1.mate(p2)
-                    if offspring:
-                        new_predators.append(offspring)
-                        predators_count += 1
-        
         plant_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(plants_count + 1000))]
         herbivore_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(herbivores_count + 1000))]
         predator_angles = [random.uniform(0, 2 * math.pi) for _ in range(int(predators_count + 1000))]
